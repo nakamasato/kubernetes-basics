@@ -3,8 +3,8 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: nginx-service
-  name: nginx-service
+    app: nginx
+  name: nginx
 spec:
   ports:
   - name: 80-80
@@ -12,7 +12,7 @@ spec:
     protocol: TCP
     targetPort: 80
   selector:
-    app: nginx-service
+    app: nginx
   type: ClusterIP
 status:
   loadBalancer: {}

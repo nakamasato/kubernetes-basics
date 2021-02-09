@@ -14,11 +14,11 @@ kubectl create namespace $namespace
 ## Create nginx with imperative command (in `default` namespace) (命令型)
 
 ```
-kubectl create deployment nginx-deployment --image nginx
+kubectl create deployment nginx --image nginx
 ```
 
 ```
-kubectl get deployment nginx-deployment
+kubectl get deployment nginx
 ```
 
 ## Create nginx in a declerative way (宣言型) (in your own namespace)
@@ -26,7 +26,7 @@ kubectl get deployment nginx-deployment
 Create a kubernetes manifest file (with 2 replicas)
 
 ```
-kubectl create deployment nginx-deployment --image nginx --replicas=2 --dry-run=client --output yaml > nginx-deployment.yaml
+kubectl create deployment nginx --image nginx --replicas=2 --dry-run=client --output yaml > nginx-deployment.yaml
 ```
 
 ```
@@ -52,5 +52,16 @@ kubectl describe rs -n $namespace
 ## Create service for nginx
 
 ```
-kubectl create service nginx-service --dry-run=client --output=yaml > nginx-service.yaml
+kubectl create service clusterip nginx --tcp=80:80 --dry-run=client --output yaml > nginx-service.yaml
 ```
+
+```
+kubectl apply -f nginx-service.yaml -n $namespace
+```
+
+```
+kubectl get svc
+```
+
+```
+
