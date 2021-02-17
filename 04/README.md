@@ -19,7 +19,7 @@ kubectl create namespace $namespace
     naka   Active   71m
     ```
 
-## Create nginx with imperative command (in `default` namespace) (命令型)
+## Create nginx with imperative command (命令型)
 
 ```
 kubectl create deployment nginx --image nginx --namespace $namespace
@@ -29,15 +29,15 @@ kubectl create deployment nginx --image nginx --namespace $namespace
 kubectl get deployment nginx --namespace $namespace
 ```
 
-- [ ] Check deployment exists in `default` namespace
+- [ ] Check deployment exists in your namespace
 
     ```
-    kubectl get deploy -n default
+    kubectl get deploy -n $namespace
     NAME    READY   UP-TO-DATE   AVAILABLE   AGE
     nginx   1/1     1            1           71m
     ```
 
-## Create nginx in a declerative way (宣言型) (in your own namespace)
+## Create nginx in a declerative way (宣言型)
 
 Create a kubernetes manifest file (with 2 replicas)
 
