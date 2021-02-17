@@ -22,11 +22,11 @@ kubectl create namespace $namespace
 ## Create nginx with imperative command (in `default` namespace) (命令型)
 
 ```
-kubectl create deployment nginx --image nginx
+kubectl create deployment nginx --image nginx --namespace $namespace
 ```
 
 ```
-kubectl get deployment nginx
+kubectl get deployment nginx --namespace $namespace
 ```
 
 - [ ] Check deployment exists in `default` namespace
