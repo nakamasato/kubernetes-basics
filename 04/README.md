@@ -21,21 +21,31 @@ kubectl create namespace $namespace
 
 ## Create nginx with imperative command (命令型)
 
-```
-kubectl create deployment nginx --image nginx --namespace $namespace
-```
-
-```
-kubectl get deployment nginx --namespace $namespace
-```
-
-- [ ] Check deployment exists in your namespace
+1. Create nginx
 
     ```
-    kubectl get deploy -n $namespace
-    NAME    READY   UP-TO-DATE   AVAILABLE   AGE
-    nginx   1/1     1            1           71m
+    kubectl create deployment nginx --image nginx --namespace $namespace
     ```
+
+    - [ ] Check deployment exists in your namespace
+
+        ```
+        kubectl get deploy -n $namespace
+        NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+        nginx   1/1     1            1           71m
+        ```
+
+1. Delete nginx
+
+    ```
+    kubectl delete deployment nginx -n $namespace
+    ```
+
+    - [ ] Check everything is cleaned up
+
+        ```
+        kubectl get all -n $namespace
+        ```
 
 ## Create nginx in a declerative way (宣言型)
 
