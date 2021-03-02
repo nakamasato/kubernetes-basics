@@ -68,7 +68,15 @@ kubectl create ns $namespace
 1. Apply `ConfigMap` and `Deployment`
 
     ```
-    kubectl apply -f nginx-configmap.yaml,nginx-deployment.yaml -n $namespace
+    kubectl apply -f nginx-configmap.yaml,nginx-deployment.yaml,nginx-service.yaml -n $namespace
     ```
 
-1. Check 
+1. Check
+
+    port forward
+
+    ```
+    kubectl -n $namespace port-forward service/nginx 8080:80
+    ```
+
+    Open http://localhost:8080 -> You'll see "My Page" in the page.
