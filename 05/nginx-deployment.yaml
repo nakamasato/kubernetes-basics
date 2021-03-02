@@ -1,12 +1,12 @@
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-deployment
+  name: nginx
 spec:
   selector:
     matchLabels:
       app: nginx
-  replicas: 2 # tells deployment to run 2 pods matching the template
+  replicas: 2
   template:
     metadata:
       labels:
@@ -24,7 +24,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: nginx-configmap
+            name: nginx
             items:
               - key: index.html
                 path: index.html
