@@ -1,4 +1,4 @@
-# 05 Set Environment Variables with ConfigMap
+# 05 Set environment specific configuraion with ConfigMap
 
 ## Prerequisite
 
@@ -23,13 +23,12 @@ kubectl create ns $namespace
 1. Check the created `ConfigMap`
 
     ```
-    ± kubectl get configmap test-configmap -o yaml
+    kubectl get configmap test-configmap -o yaml
     ```
 
     <details>
 
     ```
-    kubectl get configmap test-configmap -o yaml
     apiVersion: v1
     data:
       hostname: test.com
@@ -41,7 +40,7 @@ kubectl create ns $namespace
       - apiVersion: v1
         fieldsType: FieldsV1
         fieldsV1:
-        f:data:
+          f:data:
             .: {}
             f:hostname: {}
             f:username: {}
