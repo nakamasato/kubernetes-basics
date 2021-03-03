@@ -1,4 +1,4 @@
-# 05 Set Environment Variables with ConfigMap
+# 05 Set environment specific configuraion with ConfigMap
 
 ## Prerequisite
 

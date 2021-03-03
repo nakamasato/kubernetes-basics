@@ -1,4 +1,4 @@
-# 06 Set Environment Variables with Secrets
+# 06 Set environment specific configuration with Secrets
 
 ## Prerequisite
 
@@ -78,7 +78,32 @@ kubectl create ns $namespace
 
 ## Nginx with basic auth
 
-1. Prepare Secret for basic auth
+1. Prepare `ConfigMap` `nginx-configmap.yaml`
+
+    `default.conf` is added to the ConfigMap that we used last time.
+
+    ```
+      default.conf: |
+        server {
+            listen       80;
+            server_name  localhost;
+
+            location / {
+                root   /usr/share/nginx/html;
+                index  index.html index.htm;
+                auth_basic "Restricted";
+                auth_basic_user_file /etc/nginx/.htpasswd;
+            }
+
+            error_page   500 502 503 504  /50x.html;
+            location = /50x.html {
+                root   /usr/share/nginx/html;
+            }
+
+        }
+    ```
+
+1. Prepare `Secret` for basic auth
 
     ```
     htpasswd -nb username password
@@ -92,4 +117,56 @@ kubectl create ns $namespace
 
     https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/#creating-a-password-file
 
-1. 
+1. Prepare `Deployment` to mount `ConfigMap` and `Secret`
+
+    1. Define both `ConfigMap` and `Secret` as volume
+
+        ```
+              volumes:
+                - name: config
+                  configMap:
+                    name: nginx
+                    items:
+                      - key: index.html
+                        path: index.html
+                      - key: default.conf
+                        path: default.conf
+                - name: secret
+                  secret:
+                    secretName: nginx
+                    items:
+                      - key: .htpasswd
+                        path: .htpasswd
+        ```
+
+    1. Mount the volume from the `nginx` container
+
+
+        ```
+                  volumeMounts:
+                    - mountPath: /usr/share/nginx/html/index.html
+                      name: config
+                      subPath: index.html
+                    - mountPath: /etc/nginx/conf.d/default.conf
+                      name: config
+                      subPath: default.conf
+                    - mountPath: /etc/nginx/.htpasswd
+                      name: secret
+                      subPath: .htpasswd
+        ```
+
+1. Apply
+
+    ```
+    kubectl apply -f nginx-deployment.yaml,nginx-configmap.yaml,nginx-secret.yaml,nginx-service.yaml -n $namespace
+    ```
+
+1. Check
+
+    port forward
+
+    ```
+    kubectl -n $namespace port-forward service/nginx 8080:80
+    ```
+
+    Open http://localhost:8080 -> You'll be asked to input username and password.
