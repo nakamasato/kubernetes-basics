@@ -148,7 +148,7 @@
     -> Open http://localhost:8080 on your browser.
 
     ```
-    kubectl get endpoints svc nginx
+    kubectl get endpoints nginx
     ```
 
 1. Check all the node in the cluster
