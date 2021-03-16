@@ -9,7 +9,7 @@
 
 ## Preparation
 
-1. Install `aws`. (reference: https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/install-cliv2-mac.html)
+1. Install `aws`. (reference: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-mac.html)
 
     1. (For Mac OS) Download pkg file: https://awscli.amazonaws.com/AWSCLIV2.pkg
     1. Click the downloaded file. It'll start installation steps and follow them.
