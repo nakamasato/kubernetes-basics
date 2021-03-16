@@ -39,20 +39,20 @@
     1. Check "Programmatic access"
     1. Grant "AdministratorAccess"
     1. Click “Create User” and download the `credentials.csv` (You cannot give this credentials to anyone.)
-    1. Set up `aws` cli with the created IAM user.
+1. Set up `aws` cli with the created IAM user.
 
-        ```
-        aws configure --profile eks-setup-user
-        ```
+    ```
+    aws configure --profile eks-setup-user
+    ```
 
-        You'll be asked to fill out the following info
+    You'll be asked to fill out the following info
 
-        ```
-        AWS Access Key ID [None]: <YOUR ACCESS KEY> <- you can get it from credentials.tsv
-        AWS Secret Access Key [None]: <YOUR SECRET ACCESS KEY>  <- you can get it from credentials.tsv
-        Default region name [None]: ap-northeast-1
-        Default output format [None]:
-        ```
+    ```
+    AWS Access Key ID [None]: <YOUR ACCESS KEY> <- you can get it from credentials.tsv
+    AWS Secret Access Key [None]: <YOUR SECRET ACCESS KEY>  <- you can get it from credentials.tsv
+    Default region name [None]: ap-northeast-1
+    Default output format [None]:
+    ```
 
 1. Install `eksctl`. (Reference: https://github.com/weaveworks/eksctl#installation)
 
