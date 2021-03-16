@@ -43,8 +43,13 @@
 
         ```
         aws configure --profile eks-setup-user
-        AWS Access Key ID [None]: <YOUR ACCESS KEY>
-        AWS Secret Access Key [None]: <YOUR SECRET ACCESS KEY>
+        ```
+
+        You'll be asked to fill out the following info
+
+        ```
+        AWS Access Key ID [None]: <YOUR ACCESS KEY> <- you can get it from credentials.tsv
+        AWS Secret Access Key [None]: <YOUR SECRET ACCESS KEY>  <- you can get it from credentials.tsv
         Default region name [None]: ap-northeast-1
         Default output format [None]:
         ```
