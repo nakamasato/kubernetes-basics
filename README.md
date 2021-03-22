@@ -8,3 +8,4 @@
 - [06 Set environment specific configuration with Secrets](06)
 - [07 Debug](07)
 - [08 Set up an EKS cluster with eksctl](08)
+- [09 CI/CD](09)
