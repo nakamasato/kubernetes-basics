@@ -26,16 +26,16 @@
 
     Either of the following methods:
 
-    1. Port forward the service (port: 30080)
-
-        ```
-        kubectl -n argocd port-forward service/argocd-server 30080:80
-        ```
-
     1. Create `Service` with `NodePort` type (port: 30080)
 
         ```
         kubectl apply -f argocd-install/argocd-server-node-port.yaml -n argocd
+        ```
+
+    1. Port forward the service (port: 30080)
+
+        ```
+        kubectl -n argocd port-forward service/argocd-server 30080:80
         ```
 
 1. Login
