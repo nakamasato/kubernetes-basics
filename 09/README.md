@@ -62,11 +62,16 @@
 
 ## Clean up
 
-```
-kubectl delete -f argocd-application-test.yaml
-kubectl delete -f argocd-appproject-test.yaml
-```
+1. Delete ArgoCD `Application` and `AppProject`.
 
-```
-kubectl delete ns argocd
-```
+    ```
+    kubectl delete -f argocd-application-test.yaml
+    kubectl delete -f argocd-appproject-test.yaml
+    ```
+
+1. Uninstall ArgoCD and delete the `argocd` namespace.
+
+    ```
+    kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.8.7/manifests/install.yaml
+    kubectl delete ns argocd
+    ```
