@@ -41,7 +41,7 @@
 1. Login
 
     Open https://localhost:30080, click on `Advanced` and `Proceed to localhost (unsafe)` (this is ok because we're connecting to the argocd running in our local computer)
-    
+
     - username: `admin`
     - password: pod name for argocd-server (can be got by `kubectl get po -n argocd | grep argocd-server | awk '{print $1}'`)
 
