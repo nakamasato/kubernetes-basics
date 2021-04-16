@@ -2,7 +2,15 @@
 
 ## Prerequisite
 
-- ArgoCD is already installed. (If not, please go back to [09](../09/README.md) and install it and confirm you can open the ArgoCD UI.)
+- ArgoCD is already installed.
+
+If not, you can install with the following commands:
+
+```
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.8.7/manifests/install.yaml
+kubectl expose deployment argocd-server --type=NodePort --name=argocd-server-node-port --target-port=8080 --port=30080 -n argocd
+```
 
 ##
 
@@ -12,5 +20,9 @@
 1. Create ArgoCD Application yaml file. (name: argocd-final-assignment, project: default, namespace: default, source: <your git repository>, revision: master, path: argocd-test) [argocd-final-assignment.yaml]()
 1. Apply ArgoCD Application by `kubectl apply -f argocd-final-assignment.yaml`
 1. Check application is running on ArgoCD UI.
+    <img src="argocd-final-assignment-01.png" width="400"/>
 1. Change `argocd-test/nginx-deployment.yaml` to `replicas: 3`
 1. Check argocd-final-assignment has 3 pods on ArgoCD UI.
+    <img src="argocd-final-assignment-02.png" width="400"/>
+1. Change image with `nginx:1.15.2` in `argocd-test/nginx-deployment.yaml` and push.
+1. Check argocd-final-assignment and image is updated.

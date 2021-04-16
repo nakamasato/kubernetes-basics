@@ -10,10 +10,10 @@ spec:
   project: default
   source:
     repoURL: https://github.com/nakamasato/kubernetes-basics-2021.git
-    targetRevision: master
+    targetRevision: add-argocd-final-assignment
     path: argocd-test
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: master
   syncPolicy:
     automated: {}
