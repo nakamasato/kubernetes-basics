@@ -9,7 +9,7 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app: nginx
+      app: nginx:1.15.2
   strategy: {}
   template:
     metadata:
