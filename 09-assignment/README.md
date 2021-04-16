@@ -26,3 +26,9 @@ kubectl expose deployment argocd-server --type=NodePort --name=argocd-server-nod
     <img src="argocd-final-assignment-02.png" width="400"/>
 1. Change image with `nginx:1.15.2` in `argocd-test/nginx-deployment.yaml` and push.
 1. Check argocd-final-assignment and image is updated.
+    - During rolling update:
+        <img src="argocd-final-assignment-03.png" width="400"/>
+    - After updating:
+        <img src="argocd-final-assignment-04.png" width="400"/>
+    - Check the image in the new replicaset:
+        <img src="argocd-final-assignment-05.png" width="400"/>
