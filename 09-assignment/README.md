@@ -12,7 +12,7 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v1
 kubectl expose deployment argocd-server --type=NodePort --name=argocd-server-node-port --target-port=8080 --port=30080 -n argocd
 ```
 
-##
+## Step
 
 1. Create your own Git repository.
 1. Create `argocd-test/nginx-deployment.yaml`. (You can copy the file from this repo.)
