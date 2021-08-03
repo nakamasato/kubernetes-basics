@@ -20,7 +20,7 @@
     1. Double-click Docker.app in the Applications folder to start Docker.
 1. Check if Docker is running.
 1. Enable Kubernetes (https://docs.docker.com/desktop/kubernetes/#enable-kubernetes)
-1. 
+1.
 
 
 ## Visual Studio Code
