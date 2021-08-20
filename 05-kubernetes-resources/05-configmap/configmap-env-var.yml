@@ -11,10 +11,11 @@ kind: Pod
 metadata:
   name: test-pod
 spec:
+  restartPolicy: Never
   containers:
     - name: busybox
       image: k8s.gcr.io/busybox
-      command: [ "/bin/sh", "-c", "env" ] # print env var
+      command: [ "env" ] # print env var
       envFrom:
         - configMapRef:
             name: test-config

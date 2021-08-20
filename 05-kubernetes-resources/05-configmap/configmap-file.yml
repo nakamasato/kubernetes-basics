@@ -14,6 +14,7 @@ kind: Pod
 metadata:
   name: test-pod
 spec:
+  restartPolicy: Never
   containers:
     - name: busybox
       image: k8s.gcr.io/busybox
@@ -26,3 +27,4 @@ spec:
     - name: config
       configMap:
         name: test-file
+
