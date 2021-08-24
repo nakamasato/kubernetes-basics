@@ -6,8 +6,20 @@ kubectl create secret generic mysecret --from-literal=username=admin --from-lite
 
 # data.csv
 
+data.csv
+
+```csv
+name,age,email,password
+naka,1,naka@example.com,j4gn43g4gr
+tanaka,2,tanaka@example.com,8j437fkw3v
 ```
-echo -n 'name,age,email,password\nnaka,1,naka@example.com,j4gn43g4gr\ntanaka,2,tanaka@example.com,8j437fkw3v' | base64
+
+Encode `data.csv`
+
+```
+echo -n 'name,age,email,password
+naka,1,naka@example.com,j4gn43g4gr
+tanaka,2,tanaka@example.com,8j437fkw3v' | base64
 bmFtZSxhZ2UsZW1haWwscGFzc3dvcmQKbmFrYSwxLG5ha2FAZXhhbXBsZS5jb20sajRnbjQzZzRncgp0YW5ha2EsMix0YW5ha2FAZXhhbXBsZS5jb20sOGo0Mzdma3czdg==
 ```
 
