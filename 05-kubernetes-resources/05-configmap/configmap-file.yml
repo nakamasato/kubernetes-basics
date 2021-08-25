@@ -27,4 +27,3 @@ spec:
     - name: config
       configMap:
         name: test-file
-
