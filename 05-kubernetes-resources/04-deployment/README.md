@@ -2,9 +2,9 @@
 
 1. Create Deployment
 
-```
-kubectl apply -f deployment.yaml
-```
+    ```
+    kubectl apply -f deployment.yaml
+    ```
 
 1. Check
 
