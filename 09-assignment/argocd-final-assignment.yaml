@@ -1,0 +1,19 @@
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-final-assignment
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/nakamasato/kubernetes-basics-2021.git
+    targetRevision: add-argocd-final-assignment
+    path: argocd-test
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: master
+  syncPolicy:
+    automated: {}
