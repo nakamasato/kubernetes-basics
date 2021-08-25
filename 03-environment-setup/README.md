@@ -1,4 +1,4 @@
-# Enviroment Preparation
+# Environment Setup
 
 ## Docker Desktop
 
