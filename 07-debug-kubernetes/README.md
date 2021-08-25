@@ -1,4 +1,4 @@
-# 07 Debug
+# Debug
 
 ## Prepare
 

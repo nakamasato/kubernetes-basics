@@ -1,4 +1,4 @@
-# 04 Deploy simple application
+# Deploy simple application
 
 
 ## Create your namespace

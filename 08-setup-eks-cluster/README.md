@@ -1,4 +1,4 @@
-# 08 Set up an AWS EKS (Elastic Kubernetes Service) cluster
+# Set up an AWS EKS (Elastic Kubernetes Service) cluster
 
 ## Setup methods
 

@@ -1,8 +1,8 @@
 # Kubernetes Basics
 
-1. [Introduction](01-introduction)
-1. [Kubernetes Overview](02-kubernetes-overview)
-1. [Kubernetes Environment Setup](03-kubernetes-environment-setup)
+1. Introduction
+1. Kubernetes Overview
+1. [Kubernetes Environment Setup](03-environment-setup)
 1. [kubectl](04-kubectl)
 1. [Kubernetes Resources](05-kubernetes-resources)
 1. [Kubernetes Practice](06-kubernetes-practice)
