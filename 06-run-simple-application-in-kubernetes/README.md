@@ -1,11 +1,12 @@
 # Deploy Simple Application in Kubernetes
 
 ## Diagram
-1. Application
-    ![](diagram.drawio.svg)
-1. Kubernetes Objects
-    ![](kubernetes-object.drawio.svg)
+### Application
 
+![](diagram.drawio.svg)
+### Kubernetes Objects
+
+![](kubernetes-object.drawio.svg)
 
 ## Create database namespace
 
