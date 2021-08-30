@@ -8,7 +8,9 @@
 
 ![](kubernetes-object.drawio.svg)
 
-## Create database namespace
+## Create MySQL (Deployment and Service) in database namespace
+
+Notice: `StatefulSet` is more preferable resource to manage database applications, but just for simplicity `Deployment` is used for MySQL here.
 
 1. Create `database` namespace.
     ```
@@ -22,10 +24,6 @@
         NAME       STATUS   AGE
         database   Active   9s
         ```
-
-## Create MySQL (Deployment and Service)
-
-Notice: `StatefulSet` is more preferable resource to manage database applications, but just for simplicity `Deployment` is used for MySQL here.
 
 1. Create Deployment for MySQL.
 
@@ -132,7 +130,9 @@ Notice: `StatefulSet` is more preferable resource to manage database application
             kubectl get service -n database
             ```
 
-## Create your namespace
+## Create sample application (Deployment, ConfigMap, Secret, and Service) in your namespace
+
+Sample application: https://github.com/nakamasato/fastapi-sample
 
 1. Set your name to `namespace` variable.
 
@@ -151,10 +151,6 @@ Notice: `StatefulSet` is more preferable resource to manage database application
         NAME   STATUS   AGE
         naka   Active   71m
         ```
-
-## Create sample application (Deployment, ConfigMap, Secret)
-
-Sample application: https://github.com/nakamasato/fastapi-sample
 
 1. Create `Deployment` yaml.
 
