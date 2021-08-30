@@ -20,5 +20,15 @@ spec:
       containers:
       - image: mysql:5.7
         name: mysql
+        # https://hub.docker.com/_/mysql
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: password
+          - name: MYSQL_DATABASE
+            value: test_db
+          - name: MYSQL_USER
+            value: sample_app
+          - name: MYSQL_PASSWORD
+            value: password
         resources: {}
 status: {}
