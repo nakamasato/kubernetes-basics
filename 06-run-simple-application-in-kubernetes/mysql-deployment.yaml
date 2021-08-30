@@ -3,22 +3,22 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: nginx
-  name: nginx
+    app: mysql
+  name: mysql
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: nginx
+      app: mysql
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: nginx
+        app: mysql
     spec:
       containers:
-      - image: nginx:1.15.12
-        name: nginx
+      - image: mysql:5.7
+        name: mysql
         resources: {}
 status: {}

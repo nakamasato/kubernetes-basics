@@ -3,22 +3,22 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: nginx
-  name: nginx
+    app: sample-app
+  name: sample-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: nginx
+      app: sample-app
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: nginx
+        app: sample-app
     spec:
       containers:
-      - image: nginx:1.14.2
-        name: nginx
+      - image: ghcr.io/nakamasato/fastapi-sample:v1.0
+        name: fastapi-sample
         resources: {}
 status: {}

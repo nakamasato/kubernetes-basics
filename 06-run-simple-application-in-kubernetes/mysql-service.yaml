@@ -3,16 +3,16 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: nginx
-  name: nginx
+    app: mysql
+  name: mysql
 spec:
   ports:
-  - name: 80-80
-    port: 80
+  - name: "3306"
+    port: 3306
     protocol: TCP
-    targetPort: 80
+    targetPort: 3306
   selector:
-    app: nginx
+    app: mysql
   type: ClusterIP
 status:
   loadBalancer: {}
