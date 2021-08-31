@@ -154,9 +154,23 @@ Sample application: https://github.com/nakamasato/fastapi-sample
 
 1. Create `Deployment` yaml.
 
-    - [ ] Set container image to `ghcr.io/nakamasato/fastapi-sample:v1.0`.
-    - [ ] Set environment variables `MYSQL_HOST`, `MYSQL_DATABASE`, and `MYSQL_USER` with `ConfigMap`.
-    - [ ] Set environment variable `MYSQL_PASSWORD` with `Secret`.
+    - [ ] Create Deployemnt yaml with container image to `ghcr.io/nakamasato/fastapi-sample:v1.0`.
+        ```
+        kubectl create deploy sample-app --image=ghcr.io/nakamasato/fastapi-sample:v1.0 --dry-run=client -o yaml > sample-app-deployment.yaml
+        ```
+    - [ ] Set environment variables from `ConfigMap`.
+        ```yaml
+        envFrom:
+          - configMapRef:
+              name: sample-app
+        ```
+    - [ ] Set environment variable from `Secret`.
+        ```yaml
+        envFrom:
+          ..
+          - secretRef:
+              name: sample-app
+        ```
 
 1. Create `ConfigMap` yaml.
 
@@ -214,6 +228,12 @@ Sample application: https://github.com/nakamasato/fastapi-sample
     kubectl apply -f sample-app-service.yaml -n $namespace
     ```
 
+    <details><summary>How to create the yaml easily</summary>
+
+        kubectl create service clusterip sample-app --tcp=80 --dry-run=client -o yaml > sample-app-service.yaml
+
+    </details>
+
     - [ ] Check the created `Service`
 
         ```
@@ -245,5 +265,6 @@ Sample application: https://github.com/nakamasato/fastapi-sample
 ```
 kubectl delete -f sample-app-deployment.yaml,sample-app-configmap.yaml,sample-app-secret.yaml,sample-app-service.yaml -n $namespace
 kubectl delete -f mysql-deployment.yaml,mysql-service.yaml -n database
-kubectl delete ns $namespace,database
+kubectl delete ns $namespace
+kubectl delete ns database
 ```
