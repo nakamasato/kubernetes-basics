@@ -177,7 +177,7 @@ Sample application: https://github.com/nakamasato/fastapi-sample
     1. Prepare `env.txt`.
 
         ```
-        MYSQL_HOST=mysql
+        MYSQL_HOST=mysql.database.svc.cluster.local
         MYSQL_DATABASE=test_db
         MYSQL_USER=sample_app
         ```
