@@ -4,15 +4,15 @@ metadata:
   creationTimestamp: null
   labels:
     run: nginx
-  name: nginx
+  name: nginx-2
 spec:
   ports:
-  - name: 80-80
+  - name: "80"
     port: 80
     protocol: TCP
     targetPort: 80
   selector:
-    run: nginx
+    run: nonexisting
   type: ClusterIP
 status:
   loadBalancer: {}

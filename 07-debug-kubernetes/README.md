@@ -94,37 +94,35 @@ kubectl get node -o jsonpath='{.items[*].metadata.name}'
 
 ## Practice Debugging
 
-### 1. What kind of pods are running in the cluster?
 
-1. List all pods in all namespaces.
+### Node
 
-    ```
-    kubectl get pod -A
-    ```
+#### 1. How to check the status of all nodes in the cluster?
 
-    <details>
+1. List all nodes in the cluster.
 
     ```
-    kubectl get po -A
-    NAMESPACE     NAME                                     READY   STATUS             RESTARTS   AGE
-    default       nginx-1                                  0/1     ImagePullBackOff   0          32m
-    default       nginx-2                                  0/1     Pending            0          32m
-    default       nginx-3                                  1/1     Running            0          32m
-    kube-system   coredns-777fb94669-bvm4d                 1/1     Running            3          79d
-    kube-system   coredns-777fb94669-pxv9j                 1/1     Running            3          79d
-    kube-system   etcd-docker-desktop                      1/1     Running            6          79d
-    kube-system   kube-apiserver-docker-desktop            1/1     Running            17         79d
-    kube-system   kube-controller-manager-docker-desktop   1/1     Running            3          79d
-    kube-system   kube-proxy-l6rx5                         1/1     Running            3          79d
-    kube-system   kube-scheduler-docker-desktop            1/1     Running            19         79d
-    kube-system   storage-provisioner                      1/1     Running            42         79d
-    kube-system   vpnkit-controller                        1/1     Running            3          79d
-    test          nginx-4                                  1/1     Running            0          32m
+    kubectl get node
+    ```
+
+    <details><summary>result</summary>
+
+    ```
+    kubectl get node
+    NAME             STATUS   ROLES                  AGE    VERSION
+    docker-desktop   Ready    control-plane,master   4d2h   v1.21.2
     ```
 
     </details>
 
-### 2. On which node is Pod `nginx-1` running?
+1. With `--selector` or `-l` if there are many nodes in the cluster.
+
+    ```
+    kubectl get node -l <key>=<value>
+    ```
+
+
+#### 2. On which node is Pod `nginx-1` running?
 
 1. Check which node `nginx-1` Pod is running on.
 
@@ -142,9 +140,126 @@ kubectl get node -o jsonpath='{.items[*].metadata.name}'
 
     </details>
 
-### 3. Why isn't Pod `nginx-1` running?
+#### 3. How to check all pods on a specific node?
 
-#### 3-1. `kubectl describe pod`
+1. Describe node `docker-desktop`.
+
+    ```
+    kubectl describe node docker-desktop
+    ```
+
+    <details><summary>result</summary>
+
+    ```
+    kubectl describe node docker-desktop
+    Name:               docker-desktop
+    Roles:              control-plane,master
+    Labels:             beta.kubernetes.io/arch=amd64
+                        beta.kubernetes.io/os=linux
+                        kubernetes.io/arch=amd64
+                        kubernetes.io/hostname=docker-desktop
+                        kubernetes.io/os=linux
+                        node-role.kubernetes.io/control-plane=
+                        node-role.kubernetes.io/master=
+                        node.kubernetes.io/exclude-from-external-load-balancers=
+    Annotations:        kubeadm.alpha.kubernetes.io/cri-socket: /var/run/dockershim.sock
+                        node.alpha.kubernetes.io/ttl: 0
+                        volumes.kubernetes.io/controller-managed-attach-detach: true
+    CreationTimestamp:  Sat, 28 Aug 2021 10:56:19 +0900
+    Taints:             <none>
+    Unschedulable:      false
+    Lease:
+      HolderIdentity:  docker-desktop
+      AcquireTime:     <unset>
+      RenewTime:       Wed, 01 Sep 2021 14:03:43 +0900
+    Conditions:
+      Type             Status  LastHeartbeatTime                 LastTransitionTime                    Reason                       Message
+      ----             ------  -----------------                 ------------------                    ------                       -------
+      MemoryPressure   False   Wed, 01 Sep 2021 14:03:36 +0900   Sat, 28 Aug 2021 10:56:15 +0900       KubeletHasSufficientMemory   kubelet has sufficient memory available
+      DiskPressure     False   Wed, 01 Sep 2021 14:03:36 +0900   Sat, 28 Aug 2021 10:56:15 +0900       KubeletHasNoDiskPressure     kubelet has no disk pressure
+      PIDPressure      False   Wed, 01 Sep 2021 14:03:36 +0900   Sat, 28 Aug 2021 10:56:15 +0900       KubeletHasSufficientPID      kubelet has sufficient PID available
+      Ready            True    Wed, 01 Sep 2021 14:03:36 +0900   Sat, 28 Aug 2021 10:56:19 +0900       KubeletReady                 kubelet is posting ready status
+    Addresses:
+      InternalIP:  192.168.65.4
+      Hostname:    docker-desktop
+    Capacity:
+      cpu:                8
+      ephemeral-storage:  61255492Ki
+      hugepages-1Gi:      0
+      hugepages-2Mi:      0
+      memory:             9172456Ki
+      pods:               110
+    Allocatable:
+      cpu:                8
+      ephemeral-storage:  56453061334
+      hugepages-1Gi:      0
+      hugepages-2Mi:      0
+      memory:             9070056Ki
+      pods:               110
+    System Info:
+      Machine ID:                 83fed71a-b8c8-4514-9ea5-80bdc2d0e75b
+      System UUID:                58194c9d-0000-0000-b87b-b6103835f936
+      Boot ID:                    a5c270ef-d474-4dc1-8451-1c1846b27b18
+      Kernel Version:             5.10.25-linuxkit
+      OS Image:                   Docker Desktop
+      Operating System:           linux
+      Architecture:               amd64
+      Container Runtime Version:  docker://20.10.7
+      Kubelet Version:            v1.21.2
+      Kube-Proxy Version:         v1.21.2
+    Non-terminated Pods:          (12 in total)
+      Namespace                   Name                                      CPU Requests  CPU Limits  Memory     Requests  Memory Limits  Age
+      ---------                   ----                                      ------------  ----------      ---------------  -------------  ---
+      default                     nginx-1                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
+      default                     nginx-3                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
+      kube-system                 coredns-558bd4d5db-2h2mw                  100m (1%)     0 (0%)      70Mi     (0%)        170Mi (1%)     4d3h
+      kube-system                 coredns-558bd4d5db-fzd8l                  100m (1%)     0 (0%)      70Mi     (0%)        170Mi (1%)     4d3h
+      kube-system                 etcd-docker-desktop                       100m (1%)     0 (0%)      100Mi     (1%)       0 (0%)         4d3h
+      kube-system                 kube-apiserver-docker-desktop             250m (3%)     0 (0%)      0     (0%)           0 (0%)         4d3h
+      kube-system                 kube-controller-manager-docker-desktop    200m (2%)     0 (0%)      0     (0%)           0 (0%)         4d3h
+      kube-system                 kube-proxy-klrcv                          0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
+      kube-system                 kube-scheduler-docker-desktop             100m (1%)     0 (0%)      0     (0%)           0 (0%)         4d3h
+      kube-system                 storage-provisioner                       0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
+      kube-system                 vpnkit-controller                         0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
+      test                        nginx-4                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
+    Allocated resources:
+      (Total limits may be over 100 percent, i.e., overcommitted.)
+      Resource           Requests    Limits
+      --------           --------    ------
+      cpu                850m (10%)  0 (0%)
+      memory             240Mi (2%)  340Mi (3%)
+      ephemeral-storage  0 (0%)      0 (0%)
+      hugepages-1Gi      0 (0%)      0 (0%)
+      hugepages-2Mi      0 (0%)      0 (0%)
+    Events:              <none>
+    ```
+
+    </details>
+
+    You can see the pods in `Non-terminated Pods` field:
+
+    ```
+    Non-terminated Pods:          (12 in total)
+      Namespace                   Name                                      CPU Requests  CPU Limits  Memory     Requests  Memory Limits  Age
+      ---------                   ----                                      ------------  ----------      ---------------  -------------  ---
+      default                     nginx-1                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
+      default                     nginx-3                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
+      kube-system                 coredns-558bd4d5db-2h2mw                  100m (1%)     0 (0%)      70Mi     (0%)        170Mi (1%)     4d3h
+      kube-system                 coredns-558bd4d5db-fzd8l                  100m (1%)     0 (0%)      70Mi     (0%)        170Mi (1%)     4d3h
+      kube-system                 etcd-docker-desktop                       100m (1%)     0 (0%)      100Mi     (1%)       0 (0%)         4d3h
+      kube-system                 kube-apiserver-docker-desktop             250m (3%)     0 (0%)      0     (0%)           0 (0%)         4d3h
+      kube-system                 kube-controller-manager-docker-desktop    200m (2%)     0 (0%)      0     (0%)           0 (0%)         4d3h
+      kube-system                 kube-proxy-klrcv                          0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
+      kube-system                 kube-scheduler-docker-desktop             100m (1%)     0 (0%)      0     (0%)           0 (0%)         4d3h
+      kube-system                 storage-provisioner                       0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
+      kube-system                 vpnkit-controller                         0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
+      test                        nginx-4                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
+    ```
+
+### Pod
+#### 1. Why isn't Pod `nginx-1` running?
+
+##### 1. `kubectl describe pod`
 
 1. Describe Pod `nginx-1`
     ```
@@ -221,7 +336,7 @@ kubectl get node -o jsonpath='{.items[*].metadata.name}'
 
     You can see `Error response from daemon: pull access     denied for     wrong-nginx, repository does not     exist or may     require 'docker login': denied:     requested access     to the resource is denied`
 
-#### 3-2. `kubectl get pod` with `-o yaml` option
+##### 2. `kubectl get pod` with `-o yaml` option
 
 1. Get pod `nginx-1` with `-o yaml`. (Another way to check)
 
@@ -362,7 +477,72 @@ kubectl get node -o jsonpath='{.items[*].metadata.name}'
 
     You can see `reason: ImagePullBackOff` and `message: Back-off pulling image "wrong-nginx"`
 
-### 4. How to check container logs of Pod `nginx-3`?
+
+#### 2. Why isn't `nginx-2` running?
+
+1. Describe the Pod.
+
+    ```
+    kubectl describe pod nginx-2
+    ```
+
+    <details><summary>result</summary>
+
+
+    ```
+    kubectl describe pod nginx-2
+    Name:         nginx-2
+    Namespace:    default
+    Priority:     0
+    Node:         <none>
+    Labels:       run=nginx-2
+    Annotations:  <none>
+    Status:       Pending
+    IP:
+    IPs:          <none>
+    Containers:
+      nginx-2:
+        Image:        nginx
+        Port:         <none>
+        Host Port:    <none>
+        Environment:  <none>
+        Mounts:
+          /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-574ts (ro)
+    Conditions:
+      Type           Status
+      PodScheduled   False
+    Volumes:
+      kube-api-access-574ts:
+        Type:                    Projected (a volume that contains injected data from multiple sources)
+        TokenExpirationSeconds:  3607
+        ConfigMapName:           kube-root-ca.crt
+        ConfigMapOptional:       <nil>
+        DownwardAPI:             true
+    QoS Class:                   BestEffort
+    Node-Selectors:              nodeType=test
+    Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                                 node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+    Events:
+      Type     Reason            Age                  From               Message
+      ----     ------            ----                 ----               -------
+      Warning  FailedScheduling  48s (x4 over 2m52s)  default-scheduler  0/1 nodes are available: 1 node    (s) didn't match Pod's node affinity/selector.
+    ```
+
+    </details>
+
+
+    ```
+    Events:
+      Type     Reason            Age                  From               Message
+      ----     ------            ----                 ----               -------
+      Warning  FailedScheduling  48s (x4 over 2m52s)  default-scheduler  0/1 nodes are available: 1 node    (s) didn't match Pod's node affinity/selector.
+    ```
+
+    The pod chouldn't be scheduled:  `Warning  FailedScheduling  48s (x4 over 2m52s)  default-scheduler  0/1 nodes are available: 1 node    (s) didn't match Pod's node affinity/selector.`
+
+    → `nginx-2` has `nodeSelector` with `nodeType: test`. There's no matched nodes in the cluster.
+
+#### 3. How to check container logs of Pod `nginx-3`?
 
 - Command: `kubectl logs <pod_name> <options>`
 - Important Options:
@@ -377,31 +557,51 @@ kubectl get node -o jsonpath='{.items[*].metadata.name}'
     kubectl logs nginx-3 -f --tail 20
     ```
 
-### 5. How to check if a service is available?
+1. Send some requests to the Pod.
 
-#### 5-1. Port-forward `nginx` service and check by sending request.
+    ```
+    kubectl port-forward pod/nginx-3 8080:80
+    ```
+
+    Open http://localhost:8080 -> You can see the folloing log
+
+    ```
+    127.0.0.1 - - [01/Sep/2021:23:15:35 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36" "-"
+    ```
+
+    Open http://localhost:8080/aaaa -> You can see the folloing log
+
+    ```
+    2021/09/01 23:16:35 [error] 32#32: *3 open() "/usr/share/nginx/html/aaa" failed (2: No such file or directory), client: 127.0.0.1, server: localhost, request: "GET /aaa HTTP/1.1", host: "localhost:8080"
+    127.0.0.1 - - [01/Sep/2021:23:16:35 +0000] "GET /aaa HTTP/1.1" 404 555 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36" "-"
+    ```
+
+### Service
+#### 1. How to check if a service is available?
+
+##### 1. Port-forward `nginx` service and check by sending request.
 
 ```
-kubectl port-forward svc/nginx 8080:80
+kubectl port-forward svc/nginx-1 8080:80
 ```
 
 Open http://localhost:8080 on your browser or hit the localhost:8080 by a command e.g. `curl`
 
-#### 5-2. Check `Endpoints` resource.
+##### 2. Check `Endpoints` resource.
 
 
 1. Get `Endpoints` resource
 
     ```
-    kubectl get endpoints nginx
+    kubectl get endpoints nginx-1
     ```
 
     <details><summary>result</summary>
 
     ```
-    kubectl get endpoints nginx
-    NAME    ENDPOINTS      AGE
-    nginx   10.1.0.33:80   136m
+    kubectl get endpoints nginx-1
+    NAME      ENDPOINTS   AGE
+    nginx-1   <none>      32s
     ```
 
     <details>
@@ -411,32 +611,32 @@ Open http://localhost:8080 on your browser or hit the localhost:8080 by a comman
 1. Describe `Endpoints` resource.
 
     ```
-    kubectl describe endpoints nginx
+    kubectl describe endpoints nginx-1
     ```
 
     <details><summary>result</summary>
 
     ```
-    kubectl describe endpoints nginx
-    Name:         nginx
+    kubectl describe endpoints nginx-1
+    Name:         nginx-1
     Namespace:    default
     Labels:       run=nginx
-    Annotations:  endpoints.kubernetes.io/last-change-trigger-time: 2021-09-01T02:19:00Z
+    Annotations:  endpoints.kubernetes.io/last-change-trigger-time: 2021-09-01T23:37:01Z
     Subsets:
-      Addresses:          10.1.0.33
-      NotReadyAddresses:  10.1.0.31
+      Addresses:          10.1.0.53
+      NotReadyAddresses:  10.1.0.52
       Ports:
-        Name   Port  Protocol
-        ----   ----  --------
-        80-80  80    TCP
+        Name  Port  Protocol
+        ----  ----  --------
+        80    80    TCP
 
     Events:  <none>
     ```
 
     </details>
 
-    - `Addresses:          10.1.0.33`: Pod ips for pods that are ready.
-    - `NotReadyAddresses:  10.1.0.31`: Pod ips for pods that are not ready.
+    - `Addresses:          10.1.0.53`: Pod ips for pods that are ready.
+    - `NotReadyAddresses:  10.1.0.52`: Pod ips for pods that are not ready.
 
 1. Check Pod Ips.
 
@@ -448,154 +648,99 @@ Open http://localhost:8080 on your browser or hit the localhost:8080 by a comman
 
     ```
     kubectl get pod -o wide
-    NAME      READY   STATUS             RESTARTS   AGE    IP          NODE             NOMINATED NODE   READINESS GATES
-    nginx-1   0/1     ImagePullBackOff   0          140m   10.1.0.31   docker-desktop   <none>           <none>
-    nginx-2   0/1     Pending            0          140m   <none>      <none>           <none>           <none>
-    nginx-3   1/1     Running            0          140m   10.1.0.33   docker-desktop   <none>           <none>
+    NAME      READY   STATUS         RESTARTS   AGE   IP          NODE             NOMINATED NODE   READINESS GATES
+    nginx-1   0/1     ErrImagePull   0          74s   10.1.0.52   docker-desktop   <none>           <none>
+    nginx-2   0/1     Pending        0          74s   <none>      <none>           <none>           <none>
+    nginx-3   1/1     Running        0          74s   10.1.0.53   docker-desktop   <none>           <none>
     ```
 
     </details>
 
-### 6. How to check the status of all nodes in the cluster?
+#### 2. Why is Service `nginx-2` unavailable?
 
-1. List all nodes in the cluster.
+1. Describe `Endpoints`
 
     ```
-    kubectl get node
+    kubectl describe ep nginx-2
+    ```
+
+    ```
+    kubectl describe ep nginx-2
+    Name:         nginx-2
+    Namespace:    default
+    Labels:       run=nginx
+    Annotations:  endpoints.kubernetes.io/last-change-trigger-time: 2021-09-01T23:36:54Z
+    Subsets:
+    Events:  <none>
+    ```
+
+    There's no `Subsets` -> Should be no matching Pods.
+
+1. Check `Service`'s `selector`
+
+    ```
+    kubectl get svc nginx-2 -o yaml
     ```
 
     <details><summary>result</summary>
 
     ```
-    kubectl get node
-    NAME             STATUS   ROLES                  AGE    VERSION
-    docker-desktop   Ready    control-plane,master   4d2h   v1.21.2
+    kubectl get svc nginx-2 -o yaml
+    apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/last-applied-configuration: |
+          {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"creationTimestamp":null,    "labels":{"run":"nginx"},"name":"nginx-2","namespace":"default"},"spec":{"ports":[{"name":"80",    "port":80,"protocol":"TCP","targetPort":80}],"selector":{"run":"nonexisting"},    "type":"ClusterIP"},"status":{"loadBalancer":{}}}
+      creationTimestamp: "2021-09-01T23:36:54Z"
+      labels:
+        run: nginx
+      name: nginx-2
+      namespace: default
+      resourceVersion: "182442"
+      uid: b51378b1-c273-4004-b2d9-87c26d8e6a5a
+    spec:
+      clusterIP: 10.108.232.128
+      clusterIPs:
+      - 10.108.232.128
+      ipFamilies:
+      - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+      - name: "80"
+        port: 80
+        protocol: TCP
+        targetPort: 80
+      selector:
+        run: nonexisting
+      sessionAffinity: None
+      type: ClusterIP
+    status:
+      loadBalancer: {}
     ```
 
     </details>
 
-1. With `--selector` or `-l` if there are many nodes in the cluster.
 
-    ```
-    kubectl get node -l <key>=<value>
-    ```
-
-### 7. How to check all pods on a specific node?
-
-1. Describe node `docker-desktop`.
-
-    ```
-    kubectl describe node docker-desktop
+    ```yaml
+      selector:
+        run: nonexisting
     ```
 
-    <details><summary>result</summary>
+    There's no Pod with such a label.
 
     ```
-    kubectl describe node docker-desktop
-    Name:               docker-desktop
-    Roles:              control-plane,master
-    Labels:             beta.kubernetes.io/arch=amd64
-                        beta.kubernetes.io/os=linux
-                        kubernetes.io/arch=amd64
-                        kubernetes.io/hostname=docker-desktop
-                        kubernetes.io/os=linux
-                        node-role.kubernetes.io/control-plane=
-                        node-role.kubernetes.io/master=
-                        node.kubernetes.io/exclude-from-external-load-balancers=
-    Annotations:        kubeadm.alpha.kubernetes.io/cri-socket: /var/run/dockershim.sock
-                        node.alpha.kubernetes.io/ttl: 0
-                        volumes.kubernetes.io/controller-managed-attach-detach: true
-    CreationTimestamp:  Sat, 28 Aug 2021 10:56:19 +0900
-    Taints:             <none>
-    Unschedulable:      false
-    Lease:
-      HolderIdentity:  docker-desktop
-      AcquireTime:     <unset>
-      RenewTime:       Wed, 01 Sep 2021 14:03:43 +0900
-    Conditions:
-      Type             Status  LastHeartbeatTime                 LastTransitionTime                    Reason                       Message
-      ----             ------  -----------------                 ------------------                    ------                       -------
-      MemoryPressure   False   Wed, 01 Sep 2021 14:03:36 +0900   Sat, 28 Aug 2021 10:56:15 +0900       KubeletHasSufficientMemory   kubelet has sufficient memory available
-      DiskPressure     False   Wed, 01 Sep 2021 14:03:36 +0900   Sat, 28 Aug 2021 10:56:15 +0900       KubeletHasNoDiskPressure     kubelet has no disk pressure
-      PIDPressure      False   Wed, 01 Sep 2021 14:03:36 +0900   Sat, 28 Aug 2021 10:56:15 +0900       KubeletHasSufficientPID      kubelet has sufficient PID available
-      Ready            True    Wed, 01 Sep 2021 14:03:36 +0900   Sat, 28 Aug 2021 10:56:19 +0900       KubeletReady                 kubelet is posting ready status
-    Addresses:
-      InternalIP:  192.168.65.4
-      Hostname:    docker-desktop
-    Capacity:
-      cpu:                8
-      ephemeral-storage:  61255492Ki
-      hugepages-1Gi:      0
-      hugepages-2Mi:      0
-      memory:             9172456Ki
-      pods:               110
-    Allocatable:
-      cpu:                8
-      ephemeral-storage:  56453061334
-      hugepages-1Gi:      0
-      hugepages-2Mi:      0
-      memory:             9070056Ki
-      pods:               110
-    System Info:
-      Machine ID:                 83fed71a-b8c8-4514-9ea5-80bdc2d0e75b
-      System UUID:                58194c9d-0000-0000-b87b-b6103835f936
-      Boot ID:                    a5c270ef-d474-4dc1-8451-1c1846b27b18
-      Kernel Version:             5.10.25-linuxkit
-      OS Image:                   Docker Desktop
-      Operating System:           linux
-      Architecture:               amd64
-      Container Runtime Version:  docker://20.10.7
-      Kubelet Version:            v1.21.2
-      Kube-Proxy Version:         v1.21.2
-    Non-terminated Pods:          (12 in total)
-      Namespace                   Name                                      CPU Requests  CPU Limits  Memory     Requests  Memory Limits  Age
-      ---------                   ----                                      ------------  ----------      ---------------  -------------  ---
-      default                     nginx-1                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
-      default                     nginx-3                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
-      kube-system                 coredns-558bd4d5db-2h2mw                  100m (1%)     0 (0%)      70Mi     (0%)        170Mi (1%)     4d3h
-      kube-system                 coredns-558bd4d5db-fzd8l                  100m (1%)     0 (0%)      70Mi     (0%)        170Mi (1%)     4d3h
-      kube-system                 etcd-docker-desktop                       100m (1%)     0 (0%)      100Mi     (1%)       0 (0%)         4d3h
-      kube-system                 kube-apiserver-docker-desktop             250m (3%)     0 (0%)      0     (0%)           0 (0%)         4d3h
-      kube-system                 kube-controller-manager-docker-desktop    200m (2%)     0 (0%)      0     (0%)           0 (0%)         4d3h
-      kube-system                 kube-proxy-klrcv                          0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
-      kube-system                 kube-scheduler-docker-desktop             100m (1%)     0 (0%)      0     (0%)           0 (0%)         4d3h
-      kube-system                 storage-provisioner                       0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
-      kube-system                 vpnkit-controller                         0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
-      test                        nginx-4                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
-    Allocated resources:
-      (Total limits may be over 100 percent, i.e., overcommitted.)
-      Resource           Requests    Limits
-      --------           --------    ------
-      cpu                850m (10%)  0 (0%)
-      memory             240Mi (2%)  340Mi (3%)
-      ephemeral-storage  0 (0%)      0 (0%)
-      hugepages-1Gi      0 (0%)      0 (0%)
-      hugepages-2Mi      0 (0%)      0 (0%)
-    Events:              <none>
+    kubectl get po --show-labels
+    NAME      READY   STATUS             RESTARTS   AGE   LABELS
+    nginx-1   0/1     ImagePullBackOff   0          10m   run=nginx
+    nginx-2   0/1     Pending            0          10m   run=nginx
+    nginx-3   1/1     Running            0          10m   run=nginx
     ```
 
-    </details>
-
-    You can see the pods in `Non-terminated Pods` field:
-
-    ```
-    Non-terminated Pods:          (12 in total)
-      Namespace                   Name                                      CPU Requests  CPU Limits  Memory     Requests  Memory Limits  Age
-      ---------                   ----                                      ------------  ----------      ---------------  -------------  ---
-      default                     nginx-1                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
-      default                     nginx-3                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
-      kube-system                 coredns-558bd4d5db-2h2mw                  100m (1%)     0 (0%)      70Mi     (0%)        170Mi (1%)     4d3h
-      kube-system                 coredns-558bd4d5db-fzd8l                  100m (1%)     0 (0%)      70Mi     (0%)        170Mi (1%)     4d3h
-      kube-system                 etcd-docker-desktop                       100m (1%)     0 (0%)      100Mi     (1%)       0 (0%)         4d3h
-      kube-system                 kube-apiserver-docker-desktop             250m (3%)     0 (0%)      0     (0%)           0 (0%)         4d3h
-      kube-system                 kube-controller-manager-docker-desktop    200m (2%)     0 (0%)      0     (0%)           0 (0%)         4d3h
-      kube-system                 kube-proxy-klrcv                          0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
-      kube-system                 kube-scheduler-docker-desktop             100m (1%)     0 (0%)      0     (0%)           0 (0%)         4d3h
-      kube-system                 storage-provisioner                       0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
-      kube-system                 vpnkit-controller                         0 (0%)        0 (0%)      0     (0%)           0 (0%)         4d3h
-      test                        nginx-4                                   0 (0%)        0 (0%)      0     (0%)           0 (0%)         164m
-    ```
-
+**Tips**:
+1. Check if there's matching Pods.
+1. Check if matched Pods are in `Running` state.
+1. Check if `port` is correct.
 ## Summary
 
 Commonly used `kubectl` commands for debugging:
