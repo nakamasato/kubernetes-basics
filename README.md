@@ -13,6 +13,6 @@
     1. [Secret](05-kubernetes-resources/06-secret)
     1. [Service](05-kubernetes-resources/07-service)
 1. [Run a simple app in Kubernetes](06-run-simple-application-in-kubernetes)
-1. [Kubernetes Development Basic](07-debug-kubernetes)
+1. [Debug Kubernetes](07-debug-kubernetes)
 1. [EKS setup](08-setup-eks-cluster)
 1. [CI/CD](09-cicd)
