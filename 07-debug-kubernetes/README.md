@@ -8,7 +8,7 @@ kubectl apply -f .
 
 ## Practice `kubectl get` for `Pod` and `Node`
 
-### labels
+### label & selector
 
 ```
 kubectl get pod --selector run=nginx
@@ -59,18 +59,18 @@ docker-desktop   Ready    master   79d   v1.16.6-beta.0   beta.kubernetes.io/arc
 ### output
 
 ```
-kubectl get pod -o yaml
-kubectl get node -o yaml
-```
-
-```
 kubectl get pod -o wide
 kubectl get node -o wide
 ```
 
 ```
-kubectl get pod -o json
-kubectl get node -o json
+kubectl get pod nginx-1 -o yaml
+kubectl get node docker-desktop -o yaml
+```
+
+```
+kubectl get pod nginx-1 -o json
+kubectl get node docker-desktop -o json
 ```
 
 ```
