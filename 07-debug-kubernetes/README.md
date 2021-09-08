@@ -10,25 +10,61 @@ kubectl apply -f .
 
 ### label & selector
 
+
 ```
-kubectl get pod --selector run=nginx
+kubectl get po -A
+kubectl get pod --selector run=nginx -A
+```
+
+<details>
+
+```
+kubectl get po -A
+NAMESPACE     NAME                                     READY   STATUS             RESTARTS   AGE
+default       nginx-1                                  0/1     ImagePullBackOff   0          2m58s
+default       nginx-2                                  0/1     Pending            0          2m58s
+default       nginx-3                                  1/1     Running            0          2m58s
+kube-system   coredns-558bd4d5db-2h2mw                 1/1     Running            6          5d20h
+kube-system   coredns-558bd4d5db-fzd8l                 1/1     Running            6          5d20h
+kube-system   etcd-docker-desktop                      1/1     Running            6          5d20h
+kube-system   kube-apiserver-docker-desktop            1/1     Running            6          5d20h
+kube-system   kube-controller-manager-docker-desktop   1/1     Running            6          5d20h
+kube-system   kube-proxy-klrcv                         1/1     Running            6          5d20h
+kube-system   kube-scheduler-docker-desktop            1/1     Running            6          5d20h
+kube-system   storage-provisioner                      1/1     Running            12         5d20h
+kube-system   vpnkit-controller                        1/1     Running            274        5d20h
+test          nginx-4                                  1/1     Running            0          2m58s
+```
+
+```
+kubectl get pod --selector run=nginx -A
+NAMESPACE   NAME      READY   STATUS         RESTARTS   AGE
+default     nginx-1   0/1     ErrImagePull   0          119s
+default     nginx-2   0/1     Pending        0          119s
+default     nginx-3   1/1     Running        0          119s
+test        nginx-4   1/1     Running        0          119s
+```
+
+</details>
+
+
+```
+kubectl get node
 kubectl get node -l beta.kubernetes.io/arch=amd64
 ```
 
 <details>
 
 ```
-kubectl get pod --selector run=nginx
-NAME      READY   STATUS             RESTARTS   AGE
-nginx-1   0/1     ImagePullBackOff   0          35m
-nginx-2   0/1     Pending            0          35m
-nginx-3   1/1     Running            0          35m
+kubectl get node
+NAME             STATUS   ROLES                  AGE     VERSION
+docker-desktop   Ready    control-plane,master   5d20h   v1.21.2
 ```
 
 ```
 kubectl get node -l beta.kubernetes.io/arch=amd64
-NAME             STATUS   ROLES    AGE   VERSION
-docker-desktop   Ready    master   79d   v1.16.6-beta.0
+NAME             STATUS   ROLES                  AGE     VERSION
+docker-desktop   Ready    control-plane,master   5d20h   v1.21.2
 ```
 
 </details>
