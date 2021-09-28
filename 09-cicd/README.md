@@ -4,11 +4,11 @@
 
 ## Setup
 
-1. Install ArgoCD (Version v1.8.7)
+1. Install ArgoCD (Version [v2.1.1](https://github.com/argoproj/argo-cd/releases/tag/v2.1.1))
 
     ```
     kubectl create namespace argocd
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.8.7/manifests/install.yaml
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.1.1/manifests/install.yaml
     ```
 
 1. Check
@@ -29,7 +29,7 @@
     1. Create `Service` with `NodePort` type (port: 30080)
 
         ```
-        kubectl apply -f argocd-install/argocd-server-node-port.yaml -n argocd
+        kubectl apply -f 09-cicd/argocd-install/argocd-server-node-port.yaml -n argocd
         ```
 
     1. Port forward the service (port: 30080)
@@ -43,7 +43,7 @@
     Open https://localhost:30080, click on `Advanced` and `Proceed to localhost (unsafe)` (this is ok because we're connecting to the argocd running in our local computer)
 
     - username: `admin`
-    - password: pod name for argocd-server (can be got by `kubectl get po -n argocd | grep argocd-server | awk '{print $1}'`)
+    - password: `kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath='{.data.password}' | base64 --decode`
 
     <img src="argocd.png" width="400"/>
 
