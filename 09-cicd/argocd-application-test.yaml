@@ -1,16 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: guestbook
+  name: sample-app
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: test
   source:
-    repoURL: https://github.com/argoproj/argocd-example-apps.git
-    targetRevision: HEAD
-    path: guestbook
+    repoURL: https://github.com/nakamasato/kubernetes-basics.git
+    targetRevision: v2.0-rc
+    path: 09-cicd/sample-app-manifests
   destination:
     server: https://kubernetes.default.svc
     namespace: default
