@@ -18,7 +18,7 @@ spec:
         app: sample-app
     spec:
       containers:
-      - image: ghcr.io/nakamasato/fastapi-sample:v1.0
-        name: fastapi-sample
-        resources: {}
+        - image: ghcr.io/nakamasato/fastapi-sample:v1.0
+          name: fastapi-sample
+          resources: {}
 status: {}
