@@ -6,7 +6,7 @@ metadata:
 spec:
   description: test project
   sourceRepos:
-    - "https://github.com/argoproj/*"
+    - "https://github.com/nakamasato/*"
   destinations:
     - namespace: default
       server: https://kubernetes.default.svc
