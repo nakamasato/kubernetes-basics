@@ -68,7 +68,7 @@
     kubectl apply -f mysql-manifests
     ```
 
-    Problem: Please create an ArgoCD application to sync MySQL.
+    Exercise: Please create an ArgoCD application to sync MySQL.
 
     </details>
 

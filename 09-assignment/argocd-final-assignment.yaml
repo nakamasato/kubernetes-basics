@@ -9,7 +9,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/nakamasato/kubernetes-basics-2021.git
+    repoURL: https://github.com/nakamasato/kubernetes-basics.git
     targetRevision: add-argocd-final-assignment
     path: argocd-test
   destination:

@@ -8,7 +8,7 @@ If not, you can install with the following commands:
 
 ```
 kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.8.7/manifests/install.yaml
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.1.1/manifests/install.yaml
 kubectl expose deployment argocd-server --type=NodePort --name=argocd-server-node-port --target-port=8080 --port=30080 -n argocd
 ```
 
