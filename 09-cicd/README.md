@@ -55,23 +55,41 @@
     ```
 1. Create `Application`
 
+    ```
+    kubectl apply -f argocd-application-sample-app.yaml
+    ```
+
+    <details><summary>MySQL</summary>
+
+    As you can see in [Run simple application in kubernetes](../06-run-simple-application-in-kubernetes), sample-app is dependent on mysql.
+    So you need to run mysql in `default` namespace by
 
     ```
-    kubectl apply -f argocd-application-test.yaml
+    kubectl apply -f mysql-manifests
     ```
+
+    Problem: Please create an ArgoCD application to sync MySQL.
+
+    </details>
 
 ## Clean up
+
+1. Delete MySQL
+
+    ```
+    kubectl delete -f mysql-manifests
+    ```
 
 1. Delete ArgoCD `Application` and `AppProject`.
 
     ```
     kubectl delete -f argocd-application-test.yaml
-    kubectl delete -f argocd-appproject-test.yaml
+    kubectl delete -f argocd-appproject-sample-app.yaml
     ```
 
 1. Uninstall ArgoCD and delete the `argocd` namespace.
 
     ```
-    kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.8.7/manifests/install.yaml
+    kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.1.1/manifests/install.yaml
     kubectl delete ns argocd
     ```
