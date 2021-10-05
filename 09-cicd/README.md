@@ -83,8 +83,8 @@
 1. Delete ArgoCD `Application` and `AppProject`.
 
     ```
-    kubectl delete -f argocd-application-test.yaml
-    kubectl delete -f argocd-appproject-sample-app.yaml
+    kubectl delete -f argocd-application-sample-app.yaml
+    kubectl delete -f argocd-appproject-test.yaml
     ```
 
 1. Uninstall ArgoCD and delete the `argocd` namespace.
