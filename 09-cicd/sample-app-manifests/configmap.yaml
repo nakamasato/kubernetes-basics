@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  MYSQL_DATABASE: test_db
+  MYSQL_HOST: mysql # if mysql is in different namepsace, need to specify here. e.g. mysql.<namespace>
+  MYSQL_USER: sample_app
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: sample-app
