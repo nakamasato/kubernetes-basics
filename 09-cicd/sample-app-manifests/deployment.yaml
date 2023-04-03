@@ -18,7 +18,7 @@ spec:
         app: sample-app
     spec:
       containers:
-        - image: ghcr.io/nezchu/fastapi-sample:pr-1
+        - image: ghcr.io/nezchu/fastapi-sample:pr-2
           name: fastapi-sample
           envFrom:
             - configMapRef:
