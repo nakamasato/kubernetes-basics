@@ -122,6 +122,3 @@ eksctl create cluster --name test-cluster --region ap-northeast-1 --profile eks-
 1. 0.40.0
 1. 0.66.0
 1. 0.137.0
-
-
-
