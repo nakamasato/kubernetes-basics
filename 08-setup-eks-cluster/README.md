@@ -75,6 +75,32 @@
 eksctl create cluster --name test-cluster --region ap-northeast-1 --profile eks-setup-user
 ```
 
+## Set up kubeconfig
+
+```
+aws eks update-kubeconfig --name test-cluster --profile setup-eks-user
+```
+
+You can check the created eks cluster `test-cluster` is configured in `~/.kube/config`.
+
+You can also check the connected cluster with the following command:
+
+```
+kubectl cluster-info
+```
+
+<details>
+
+```
+Kubernetes control plane is running at https://xxxxxx.yl4.ap-northeast-1.eks.amazonaws.com
+CoreDNS is running at https://xxxxx.yl4.ap-northeast-1.eks.amazonaws.com/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+```
+
+</details>
+
+
 ## Check
 
 1. Check `Node`
