@@ -203,7 +203,7 @@ To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 
 ## References
 
-- [Quickstart Amazon EKS](https://github.com/aws-quickstart/quickstart-amazon-eks)
+- https://eksctl.io/
 
 ## Checked versions
 
