@@ -36,9 +36,12 @@
     1. Log in to your AWS account with root user. https://console.aws.amazon.com/iam/home?region=ap-northeast-1#/home
     1. Open [IAM page](https://console.aws.amazon.com/iam/home?region=ap-northeast-1#/home)
     1. "Add user" and write "eks-setup-user" as a username.
-    1. Check "Programmatic access"
-    1. Grant "AdministratorAccess"
+    1. Click "Attach policies directly" and grant "AdministratorAccess"
+    1. Click the create user "eks-setup-user" and open "Security Credentials" tab.
+    1. Click "Create access key", choose "Command Line Interface (CLI)", and then create it.
     1. Click “Create User” and download the `credentials.csv` (You cannot give this credentials to anyone.)
+
+
 1. Set up `aws` cli with the created IAM user.
 
     ```
@@ -63,7 +66,7 @@
 
     ```
     eksctl version
-    0.40.0
+    0.137.0
     ```
 
 ## Create an EKS cluster (It would take around 20 mins)
@@ -112,3 +115,13 @@ eksctl create cluster --name test-cluster --region ap-northeast-1 --profile eks-
 ## References
 
 - [Quickstart Amazon EKS](https://github.com/aws-quickstart/quickstart-amazon-eks)
+
+## Checked versions
+
+`eksctl`:
+1. 0.40.0
+1. 0.66.0
+1. 0.137.0
+
+
+
