@@ -75,6 +75,69 @@
 eksctl create cluster --name test-cluster --region ap-northeast-1 --profile eks-setup-user
 ```
 
+<details>
+
+```
+2023-04-22 07:20:20 [ℹ]  eksctl version 0.137.0
+2023-04-22 07:20:20 [ℹ]  using region ap-northeast-1
+2023-04-22 07:20:20 [ℹ]  setting availability zones to [ap-northeast-1c ap-northeast-1a ap-northeast-1d]
+2023-04-22 07:20:20 [ℹ]  subnets for ap-northeast-1c - public:192.168.0.0/19 private:192.168.96.0/19
+2023-04-22 07:20:20 [ℹ]  subnets for ap-northeast-1a - public:192.168.32.0/19 private:192.168.128.0/19
+2023-04-22 07:20:20 [ℹ]  subnets for ap-northeast-1d - public:192.168.64.0/19 private:192.168.160.0/19
+2023-04-22 07:20:20 [ℹ]  nodegroup "ng-30993b22" will use "" [AmazonLinux2/1.25]
+2023-04-22 07:20:20 [ℹ]  using Kubernetes version 1.25
+2023-04-22 07:20:20 [ℹ]  creating EKS cluster "test-cluster" in "ap-northeast-1" region with managed nodes
+2023-04-22 07:20:20 [ℹ]  will create 2 separate CloudFormation stacks for cluster itself and the initial managed nodegroup
+2023-04-22 07:20:20 [ℹ]  if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=ap-northeast-1 --cluster=test-cluster'
+2023-04-22 07:20:20 [ℹ]  Kubernetes API endpoint access will use default of {publicAccess=true, privateAccess=false} for cluster "test-cluster" in "ap-northeast-1"
+2023-04-22 07:20:20 [ℹ]  CloudWatch logging will not be enabled for cluster "test-cluster" in "ap-northeast-1"
+2023-04-22 07:20:20 [ℹ]  you can enable it with 'eksctl utils update-cluster-logging --enable-types={SPECIFY-YOUR-LOG-TYPES-HERE (e.g. all)} --region=ap-northeast-1 --cluster=test-cluster'
+2023-04-22 07:20:20 [ℹ]
+2 sequential tasks: { create cluster control plane "test-cluster",
+    2 sequential sub-tasks: {
+        wait for control plane to become ready,
+        create managed nodegroup "ng-30993b22",
+    }
+}
+2023-04-22 07:20:20 [ℹ]  building cluster stack "eksctl-test-cluster-cluster"
+2023-04-22 07:20:21 [ℹ]  deploying stack "eksctl-test-cluster-cluster"
+2023-04-22 07:20:51 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:21:21 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:22:21 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:23:21 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:24:21 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:25:21 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:26:22 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:27:22 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:28:22 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:29:22 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:30:22 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:31:22 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-cluster"
+2023-04-22 07:33:24 [ℹ]  building managed nodegroup stack "eksctl-test-cluster-nodegroup-ng-30993b22"
+2023-04-22 07:33:24 [ℹ]  deploying stack "eksctl-test-cluster-nodegroup-ng-30993b22"
+2023-04-22 07:33:24 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-nodegroup-ng-30993b22"
+2023-04-22 07:33:54 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-nodegroup-ng-30993b22"
+2023-04-22 07:34:41 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-nodegroup-ng-30993b22"
+2023-04-22 07:35:20 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-nodegroup-ng-30993b22"
+2023-04-22 07:36:07 [ℹ]  waiting for CloudFormation stack "eksctl-test-cluster-nodegroup-ng-30993b22"
+2023-04-22 07:36:07 [ℹ]  waiting for the control plane to become ready
+2023-04-22 07:36:07 [✔]  saved kubeconfig as "/Users/m.naka/.kube/config"
+2023-04-22 07:36:07 [ℹ]  no tasks
+2023-04-22 07:36:07 [✔]  all EKS cluster resources for "test-cluster" have been created
+2023-04-22 07:36:08 [ℹ]  nodegroup "ng-30993b22" has 2 node(s)
+2023-04-22 07:36:08 [ℹ]  node "ip-192-168-42-202.ap-northeast-1.compute.internal" is ready
+2023-04-22 07:36:08 [ℹ]  node "ip-192-168-95-169.ap-northeast-1.compute.internal" is ready
+2023-04-22 07:36:08 [ℹ]  waiting for at least 2 node(s) to become ready in "ng-30993b22"
+2023-04-22 07:36:08 [ℹ]  nodegroup "ng-30993b22" has 2 node(s)
+2023-04-22 07:36:08 [ℹ]  node "ip-192-168-42-202.ap-northeast-1.compute.internal" is ready
+2023-04-22 07:36:08 [ℹ]  node "ip-192-168-95-169.ap-northeast-1.compute.internal" is ready
+2023-04-22 07:36:10 [ℹ]  kubectl command should work with "/Users/m.naka/.kube/config", try 'kubectl get nodes'
+2023-04-22 07:36:10 [✔]  EKS cluster "test-cluster" in "ap-northeast-1" region is ready
+```
+
+</details>
+
+
 ## Set up kubeconfig
 
 ```
@@ -108,8 +171,8 @@ To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
     ```
     kubectl get nodes
     NAME                                                STATUS   ROLES    AGE     VERSION
-    ip-192-168-32-253.ap-northeast-1.compute.internal   Ready    <none>   9m12s   v1.18.9-eks-d1db3c
-    ip-192-168-67-143.ap-northeast-1.compute.internal   Ready    <none>   9m12s   v1.18.9-eks-d1db3c
+    ip-192-168-42-202.ap-northeast-1.compute.internal   Ready    <none>   8m27s   v1.25.7-eks-a59e1f0
+    ip-192-168-95-169.ap-northeast-1.compute.internal   Ready    <none>   8m27s   v1.25.7-eks-a59e1f0
     ```
 
 1. Deploy and check nginx `Pod`
