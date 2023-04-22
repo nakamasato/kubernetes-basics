@@ -1,6 +1,6 @@
 # CI/CD
 
-## ArgoCD
+## [ArgoCD](https://argo-cd.readthedocs.io/en/stable/)
 
 ## Setup
 
@@ -113,6 +113,8 @@
 
     This is necessary to create a PR in the forked `kubernetes-basics` repo.
 
+    For more details about Personal Access Token, please read [Personal Access Token](https://docs.github.com/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+
 1. Add `.github/workflows/deploy-pr.yml` on a new branch.
 
     Please replace `<yourgithubname>` with your github name.
@@ -189,6 +191,9 @@
                 # Changes
                 - Update `fastapi-sample` image
     ```
+
+    1. About outputs in job: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idoutputs
+    1. GitHub Actions to create a PR: https://github.com/peter-evans/create-pull-request
 
 1. Push the commit that includes the `.github/workflows/deploy-pr.yaml` and create a pr.
 
