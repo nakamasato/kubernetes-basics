@@ -112,7 +112,7 @@
         <img src="github-secret.png" width="150"/>
 
     This is necessary to create a PR in the forked `kubernetes-basics` repo.
-    
+
     For more details about Personal Access Token, please read [Personal Access Token](https://docs.github.com/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
 1. Add `.github/workflows/deploy-pr.yml` on a new branch.
