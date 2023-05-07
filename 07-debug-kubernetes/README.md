@@ -60,7 +60,7 @@ kubectl get node
 NAME             STATUS   ROLES                  AGE     VERSION
 docker-desktop   Ready    control-plane,master   5d20h   v1.21.2
 ```
- 
+
 ```
 kubectl get node -l beta.kubernetes.io/arch=amd64
 NAME             STATUS   ROLES                  AGE     VERSION
@@ -71,7 +71,7 @@ docker-desktop   Ready    control-plane,master   5d20h   v1.21.2
 
 arm mac
 ```
-# arm mac input here
+kubectl get node
 kubectl get node -l beta.kubernetes.io/arch=arm64
 ```
 
