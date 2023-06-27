@@ -69,6 +69,28 @@ docker-desktop   Ready    control-plane,master   5d20h   v1.21.2
 
 </details>
 
+arm mac
+```
+kubectl get node
+kubectl get node -l beta.kubernetes.io/arch=arm64
+```
+
+<details>
+
+```
+kubectl get node
+NAME             STATUS   ROLES           AGE    VERSION
+docker-desktop   Ready    control-plane   4d9h   v1.25.4
+```
+
+```
+kubectl get node -l beta.kubernetes.io/arch=arm64
+NAME             STATUS   ROLES           AGE    VERSION
+docker-desktop   Ready    control-plane   4d9h   v1.25.4
+```
+
+</details>
+
 ```
 kubectl get po --show-labels
 kubectl get node --show-labels
