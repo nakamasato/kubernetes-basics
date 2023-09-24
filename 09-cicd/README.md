@@ -14,12 +14,14 @@
 1. Check
     ```
     kubectl get pod -n argocd
-    NAME                                 READY   STATUS    RESTARTS   AGE
-    argocd-application-controller-0      1/1     Running   0          90s
-    argocd-dex-server-567b48df49-svbsg   1/1     Running   0          91s
-    argocd-redis-6fb68d9df5-mxxrj        1/1     Running   0          91s
-    argocd-repo-server-6dcbd9cb-8gkjq    1/1     Running   0          91s
-    argocd-server-69678b4f65-zl98p       1/1     Running   0          91s
+    NAME                                                READY   STATUS    RESTARTS   AGE
+    argocd-application-controller-0                     1/1     Running   0          48s
+    argocd-applicationset-controller-787bfd9669-xh6hh   1/1     Running   0          48s
+    argocd-dex-server-bb76f899c-c92zj                   1/1     Running   0          48s
+    argocd-notifications-controller-5557f7bb5b-mmpzv    1/1     Running   0          48s
+    argocd-redis-b5d6bf5f5-zl6zm                        1/1     Running   0          48s
+    argocd-repo-server-56998dcf9c-bz875                 1/1     Running   0          48s
+    argocd-server-5985b6cf6f-44s47                      1/1     Running   0          48s
     ```
 
 1. Expose port
@@ -29,7 +31,7 @@
     1. Create `Service` with `NodePort` type (port: 30080)
 
         ```
-        kubectl apply -f 09-cicd/argocd-install/argocd-server-node-port.yaml -n argocd
+        kubectl apply -f argocd-server-node-port.yaml -n argocd
         ```
 
     1. Port forward the service (port: 30080)
@@ -58,6 +60,24 @@
     ```
     kubectl apply -f argocd-application-sample-app.yaml
     ```
+
+    <details>
+
+    If you're updating manifests in https://github.com/nakamasato/fastapi-sample/tree/main/manifests/fastapi-sample
+
+    ```yaml
+     spec:
+       project: test
+       source:
+    -    repoURL: https://github.com/nakamasato/kubernetes-basics.git # Forkしている場合はnakamasatoを自分のGithubアカウントに変更してく
+    ださい
+    -    targetRevision: v2.1.1
+    -    path: 09-cicd/sample-app-manifests
+    +    repoURL: https://github.com/nakamasato/fastapi-sample.git # Forkしている場合はnakamasatoを自分のGithubアカウントに変更してください
+    +    path: manifests/fastapi-sample
+    ```
+
+    </details>
 
 1. Deploy MySQL
 
