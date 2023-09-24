@@ -4,11 +4,11 @@
 
 ## Setup
 
-1. Install ArgoCD (Version [v2.1.1](https://github.com/argoproj/argo-cd/releases/tag/v2.1.1))
+1. Install ArgoCD (Version [v2.8.4](https://github.com/argoproj/argo-cd/releases/tag/v2.8.4))
 
     ```
     kubectl create namespace argocd
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.1.1/manifests/install.yaml
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.8.4/manifests/install.yaml
     ```
 
 1. Check
