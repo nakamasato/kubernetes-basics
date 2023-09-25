@@ -1,8 +1,169 @@
 # CI/CD
 
-## [ArgoCD](https://argo-cd.readthedocs.io/en/stable/)
+## 1. GitHub Actions
 
-## Setup
+### 1.1. GitHub Actions: Build and push image
+
+1. `.github/workflows/deploy-pr.yaml` in application repository e.g. https://github.com/nakamasato/fastapi-sample/pull/97
+1. `name`: Job name e.g. `deploy-pr`
+1. `on`: trigger of the workflow
+    1. Specify `pull_request` with `paths`
+1. `jobs`: define one or more jobs
+    1. Create a new job with id `build-and-push-image`
+    1. `runs-on`: define machine type for the job. e.g. `ubuntu-latest`
+    1. `steps`: series of steps in the job
+        1. `name`: (optional) step name. you can give any arbitrary name. e.g. `Checkout repository`
+        1. `uses`: specify which actions to use. e.g. `actions/checkout@v4`, `docker/build-push-action@v5`, ...
+        1. `with`: Actions' configuration. The input value is different from each GitHub Actions.
+
+```yaml
+name: deploy-pr
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - .github/workflows/deploy-pr.yml
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }} # ghcr.io/nakamasato/fastapi-sample
+
+      - name: Log in to GitHub container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: app
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+```
+
+### 1.2. GitHub Actions: Create a Pull Request to update a manifest
+
+1. Add a new job `update-manifest-file`.
+1. In the new job, we need to reference the new docker image name built in the above job `build-and-push-image`.
+    1. `outputs`: key-value map that can be referenced by subsequent jobs.
+        1. Set `outputs` in the job `build-and-push-image`
+            ```yaml
+            outputs:
+              IMAGE_FULL_NAME: ${{ steps.meta.outputs.tags }}
+            ```
+    1. `needs`: specify a list of the ids of dependent jobs.
+        ```yaml
+        needs: [build-and-push-image]
+        ```
+    1. Add a step to update manifest file.
+        ```yaml
+        - name: Update fastapi-sample image
+          env:
+            IMAGE_FULL_NAME: ${{ needs.build-and-push-image.outputs.IMAGE_FULL_NAME }}
+          run: |
+            yq -i "(.spec.template.spec.containers[] | select(.name == \"fastapi-sample\")).image = \"$IMAGE_FULL_NAME\"" manifests/fastapi-sample/deployment.yaml
+        ```
+    1. Add a step to create a pr with `peter-evans/create-pull-request@v5`
+        ```yaml
+        - name: Create PR
+          uses: peter-evans/create-pull-request@v5
+          with:
+            base: main
+            title: "Update fastapi-sample"
+            draft: true
+            body: |
+              # Changes
+              - Update `fastapi-sample` image to ${{ needs.build-and-push-image.outputs.IMAGE_FULL_NAME }}
+        ```
+
+<details><summary>Full yaml</summary>
+
+```yaml
+name: deploy-pr
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - .github/workflows/deploy-pr.yml
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push-image:
+    outputs:
+      IMAGE_FULL_NAME: ${{ steps.meta.outputs.tags }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }} # ghcr.io/nakamasato/fastapi-sample
+
+      - name: Log in to GitHub container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: app
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  update-kubernetes-manifest:
+    runs-on: ubuntu-latest
+    needs: [build-and-push-image]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update fastapi-sample image
+        env:
+          IMAGE_FULL_NAME: ${{ needs.build-and-push-image.outputs.IMAGE_FULL_NAME }}
+        run: |
+          yq -i "(.spec.template.spec.containers[] | select(.name == \"fastapi-sample\")).image = \"$IMAGE_FULL_NAME\"" manifests/fastapi-sample/deployment.yaml
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          base: main
+          title: "Update fastapi-sample"
+          draft: true
+          body: |
+            # Changes
+            - Update `fastapi-sample` image to ${{ needs.build-and-push-image.outputs.IMAGE_FULL_NAME }}
+```
+
+</details>
+
+## 2. [ArgoCD](https://argo-cd.readthedocs.io/en/stable/)
+
+### 2.1. Setup ArgoCD
 
 1. Install ArgoCD (Version [v2.8.4](https://github.com/argoproj/argo-cd/releases/tag/v2.8.4))
 
@@ -49,7 +210,7 @@
 
     <img src="argocd.png" width="400"/>
 
-## Deploy an application using ArgoCD
+### 2.2. Deploy an application using ArgoCD
 
 1. Create `AppProject`
     ```
@@ -91,7 +252,7 @@
     Exercise: Please create an ArgoCD application to sync MySQL.
 
 
-## Check Appications on ArgoCD UI
+### 2.3. Check Appications on ArgoCD UI
 
 1. Open https://localhost:30080/
 
@@ -103,12 +264,38 @@
 
     You can see all the resources applied by ArgoCD are in healthy state.
 
-## Create a GitHub Actions to update PR
+
+## 3. Clean up
+
+1. Delete MySQL
+
+    ```
+    kubectl delete -f mysql-manifests
+    ```
+
+1. Delete ArgoCD `Application` and `AppProject`.
+
+    ```
+    kubectl delete -f argocd-application-sample-app.yaml
+    kubectl delete -f argocd-appproject-test.yaml
+    ```
+
+1. Uninstall ArgoCD and delete the `argocd` namespace.
+
+    ```
+    kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.1.1/manifests/install.yaml
+    kubectl delete ns argocd
+    ```
+
+## 4. Optional Topic: Create a GitHub Actions to update PR
+
+In the example above, we used the same repository fastapi-sample for application codes and the manifest yaml files.
+In this example, you will create a GitHub Actions workflow in application repository that updates manifest file in the manifest repository.
 
 1. Fork the sample-app and kubernetes-basics repos
 
-    - https://github.com/nakamasato/fastapi-sample
-    - https://github.com/nakamasato/kubernetes-basics
+    - Application repo: https://github.com/nakamasato/fastapi-sample
+    - Manifest repo: https://github.com/nakamasato/kubernetes-basics
 
 1. Generate a Personal Access Token (PAT) and configure it in the forked `fastapi-sample` repo.
 
@@ -221,25 +408,3 @@
     1. [PR](https://github.com/nakamasato/fastapi-sample/pull/55) will trigger GitHub Actions job to create a PR in kubernetes-basics repo: https://github.com/nakamasato/kubernetes-basics/pull/17
 
 1. Merge the created PR in kubernetes-basics repo and ArgoCD will apply the change.
-
-## Clean up
-
-1. Delete MySQL
-
-    ```
-    kubectl delete -f mysql-manifests
-    ```
-
-1. Delete ArgoCD `Application` and `AppProject`.
-
-    ```
-    kubectl delete -f argocd-application-sample-app.yaml
-    kubectl delete -f argocd-appproject-test.yaml
-    ```
-
-1. Uninstall ArgoCD and delete the `argocd` namespace.
-
-    ```
-    kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.1.1/manifests/install.yaml
-    kubectl delete ns argocd
-    ```
