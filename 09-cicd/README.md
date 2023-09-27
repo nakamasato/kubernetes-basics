@@ -208,7 +208,7 @@ jobs:
     - username: `admin`
     - password: `kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath='{.data.password}' | base64 --decode`
 
-    <img src="argocd.png" width="400"/>
+    <img src="docs/argocd.png" width="400"/>
 
 ### 2.2. Deploy an application using ArgoCD
 
@@ -256,14 +256,52 @@ jobs:
 
 1. Open https://localhost:30080/
 
-    <img src="argocd-application.png" width="400"/>
+    <img src="docs/argocd-application.png" width="400"/>
 
 1. Click on the `sample-app` application.
 
-    <img src="argocd-sample-app.png" width="400"/>
+    <img src="docs/argocd-sample-app.png" width="400"/>
 
     You can see all the resources applied by ArgoCD are in healthy state.
 
+## 2.4. Deploy with/without finalizer
+
+1. Delete ArgoCD `application` (with finalizer)
+
+    ```
+    kubectl delete -f argocd-application-sample-app.yaml
+    ```
+
+    All the resources created by ArgoCD are deleted.
+
+    ```bash
+    kubectl get pod # same for service, secret, configmap
+    ```
+
+1. Create application without the finalizer
+
+    ```diff
+    - finalizers: # Cascading Deletion https://argo-cd.readthedocs.io/en/stable/user-guide/app_deletion/#about-the-deletion-finalizer
+    -   - resources-finalizer.argocd.argoproj.io
+    ```
+
+    ```
+    kubectl apply -f argocd-application-sample-app.yaml
+    ```
+
+    ```
+    kubectl get pod
+    ```
+1. Delete application
+    ```
+    kubectl delete -f argocd-application-sample-app.yaml
+    ```
+
+    The resources deployed by ArgoCD still exist
+
+    ```
+    kubectl get pod,svc,secret,cm
+    ```
 
 ## 3. Clean up
 
@@ -287,6 +325,7 @@ jobs:
     kubectl delete ns argocd
     ```
 
+
 ## 4. Optional Topic: Create a GitHub Actions to update PR
 
 In the example above, we used the same repository fastapi-sample for application codes and the manifest yaml files.
@@ -303,20 +342,20 @@ In this example, you will create a GitHub Actions workflow in application reposi
 
         Settings
 
-        <img src="github-settings.png" width="150"/>
+        <img src="docs/github-settings.png" width="150"/>
 
         Developer settings
 
-        <img src="github-developer-settings.png" width="150"/>
+        <img src="docs/github-developer-settings.png" width="150"/>
 
     1. Create Personal Access Token
 
-        <img src="github-pat.png" width="150"/>
+        <img src="docs/github-pat.png" width="150"/>
     1. Set the personal access token in the secrets of `fastapi-sample` repo.
 
         Open https://github.com/<<your_github_name>>/fastapi-sample/settings/secrets/actions
 
-        <img src="github-secret.png" width="150"/>
+        <img src="docs/github-secret.png" width="150"/>
 
     This is necessary to create a PR in the forked `kubernetes-basics` repo.
 
