@@ -381,16 +381,13 @@ In this example, you will create a GitHub Actions workflow in application reposi
         runs-on: ubuntu-latest
         outputs: # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idoutputs
           tags: ${{ steps.meta.outputs.tags }}
-        permissions:
-          contents: read
-          packages: write
 
         steps:
           - name: Checkout repository
-            uses: actions/checkout@v2
+            uses: actions/checkout@v4
 
           - name: Log in to the Container registry
-            uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+            uses: docker/login-action@v3
             with:
               registry: ${{ env.REGISTRY }}
               username: ${{ github.actor }}
@@ -398,12 +395,12 @@ In this example, you will create a GitHub Actions workflow in application reposi
 
           - name: Extract metadata (tags, labels) for Docker
             id: meta
-            uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+            uses: docker/metadata-action@v5
             with:
               images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
           - name: Build and push Docker image
-            uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+            uses: docker/build-push-action@v5
             with:
               context: app
               push: true
@@ -414,7 +411,7 @@ In this example, you will create a GitHub Actions workflow in application reposi
         runs-on: ubuntu-latest
         steps:
           - name: Checkout <yourgithubname>/kubernetes-basics #https://github.com/nakamasato/kubernetes-basics/blob/v2.0-rc/09-cicd/sample-app-manifests/deployment.yaml
-            uses: actions/checkout@v2
+            uses: actions/checkout@v4
             with:
               repository: <yourgithubname>/kubernetes-basics # レクチャーと同じように試したい場合には、 Forkして <your github account>/kubernetes-basics というふうに変更してください
               ref: v2.0-rc
@@ -427,7 +424,7 @@ In this example, you will create a GitHub Actions workflow in application reposi
               yq e -i "(.spec.template.spec.containers[]|select(.name == \"${CONTAINER_NAME}\").image)|=\"${IMAGE_FULL_NAME}\"" ${YAML_PATH}
               cat ${YAML_PATH}
           - name: Create PR
-            uses: peter-evans/create-pull-request@v3
+            uses: peter-evans/create-pull-request@v5
             with:
               token: ${{ secrets.REPO_GITHUB_TOKEN }} # レクチャー内では、Personal Access Tokenを発行して fastapi-sampleレポから kubernetes-basicsレポコードをプッシュできる権限を与えました。
               title: "Update fastapi-sample"
