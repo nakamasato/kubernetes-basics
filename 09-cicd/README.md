@@ -303,6 +303,34 @@ jobs:
     kubectl get pod,svc,secret,cm
     ```
 
+## 4. Update fastapi-sample and apply change with ArgoCD
+
+1. Check the current fastapi-sample
+
+    ```
+    kubectl port-forward svc/sample-app 8080:80
+    ```
+
+    http://localhost:8080 -> We'll see `{"message":"Hello World"}`
+
+1. Update fastapi-sample
+
+    `Hello World` -> `こんにちは`
+
+1. Push the change to the branch on which we created `deploy-pr.yaml`
+    1. A new Docker image will be built and pushed to GitHub Container Registry.
+    1. Update the image and create a Pull Request. e.g. https://github.com/nakamasato/fastapi-sample/pull/98
+1. Merge the Pull Request e.g. https://github.com/nakamasato/fastapi-sample/pull/98
+1. ArgoCD will sync the change to the Kubernetes cluster.
+
+1. Check the fastapi-sample
+
+    ```
+    kubectl port-forward svc/sample-app 8080:80
+    ```
+
+    http://localhost:8080 -> We'll see `{"message":"こんにちは"}`
+
 ## 3. Clean up
 
 1. Delete MySQL
@@ -321,10 +349,9 @@ jobs:
 1. Uninstall ArgoCD and delete the `argocd` namespace.
 
     ```
-    kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.1.1/manifests/install.yaml
+    kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.8.4/manifests/install.yaml
     kubectl delete ns argocd
     ```
-
 
 ## 4. Optional Topic: Create a GitHub Actions to update PR
 
