@@ -18,7 +18,7 @@ spec:
         app: mysql
     spec:
       containers:
-      - image: mysql:8
+      - image: mysql:8.3
         name: mysql
         args:
          - --default-authentication-plugin=mysql_native_password
