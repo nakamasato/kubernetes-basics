@@ -16,3 +16,25 @@
 1. [Debug Kubernetes](07-debug-kubernetes)
 1. [EKS setup](08-setup-eks-cluster)
 1. [CI/CD](09-cicd)
+
+## Keeping the exercises runnable
+
+Sections 04 to 07 are generated from a `.lab/lab.yaml` next to each
+`README.md`. That file holds the prose, the commands and the recorded
+output, and it is the file to edit — the `README.md` is written from it.
+
+```
+uv run scripts/labs.py render <dir>...   # lab.yaml -> README.md
+uv run scripts/labs.py check  <dir>...   # is README.md up to date?
+uv run scripts/labs.py run    <dir>...   # run the commands against the current context
+uv run scripts/labs.py run --update ...  # replace the recorded output with what actually ran
+```
+
+`run` compares each command's exit code and output against what the
+README claims. Values that change on every run (timestamps, UIDs,
+resource versions, container IDs, IP addresses, ages) are masked before
+comparing; what gets stored stays as it came out, so the README shows
+real values.
+
+When a new Kubernetes release changes what the commands print, run with
+`--update` and review the diff.
