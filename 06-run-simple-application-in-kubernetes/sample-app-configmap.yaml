@@ -5,5 +5,4 @@ data:
   MYSQL_USER: sample_app
 kind: ConfigMap
 metadata:
-  creationTimestamp: null
   name: sample-app

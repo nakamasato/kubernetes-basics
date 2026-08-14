@@ -13,6 +13,7 @@
 Notice: `StatefulSet` is more preferable resource to manage database applications, but just for simplicity `Deployment` is used for MySQL here.
 
 1. Create `database` namespace.
+
     ```
     kubectl create namespace database
     ```
@@ -139,7 +140,9 @@ Sample application: https://github.com/nakamasato/fastapi-sample
     ```
     namespace=<yourname>
     ```
+
 1. Create your namespace.
+
     ```
     kubectl create namespace $namespace
     ```
@@ -155,16 +158,21 @@ Sample application: https://github.com/nakamasato/fastapi-sample
 1. Create `Deployment` yaml.
 
     - [ ] Create Deployemnt yaml with container image to `ghcr.io/nakamasato/fastapi-sample:v1.0`.
+
         ```
         kubectl create deploy sample-app --image=ghcr.io/nakamasato/fastapi-sample:v1.0 --dry-run=client -o yaml > sample-app-deployment.yaml
         ```
+
     - [ ] Set environment variables from `ConfigMap`.
+
         ```yaml
         envFrom:
           - configMapRef:
               name: sample-app
         ```
+
     - [ ] Set environment variable from `Secret`.
+
         ```yaml
         envFrom:
           ..
@@ -181,7 +189,9 @@ Sample application: https://github.com/nakamasato/fastapi-sample
         MYSQL_DATABASE=test_db
         MYSQL_USER=sample_app
         ```
+
     1. Create yaml from `env.txt`.
+
         ```
         kubectl create cm sample-app --from-env-file=env.txt --dry-run=client -o yaml > sample-app-configmap.yaml
         ```
@@ -241,7 +251,6 @@ Sample application: https://github.com/nakamasato/fastapi-sample
         ```
 
     - [ ] Check accessibility with `kubectl port-forward`
-
 
         ```
         kubectl port-forward svc/sample-app 8080:80 -n $namespace

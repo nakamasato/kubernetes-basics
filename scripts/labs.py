@@ -13,6 +13,7 @@
 
 import argparse
 import difflib
+import os
 import re
 import subprocess
 import sys
@@ -71,7 +72,8 @@ def render_exec(ex):
 
     if ex.get("desc"):
         outer = INDENT * (ex.get("level", 1) - 1) if listed else ""
-        parts.append(f"{outer}1. {ex['desc']}" if listed else ex["desc"])
+        marker = ex.get("marker", "1.")
+        parts.append(f"{outer}{marker} {ex['desc']}" if listed else ex["desc"])
     if ex.get("note"):
         parts.append(indent_block(ex["note"], indent))
 
@@ -96,7 +98,7 @@ def render(lab):
     parts = []
     for block in lab["blocks"]:
         if "md" in block:
-            parts.append(block["md"].rstrip("\n"))
+            parts.append(indent_block(block["md"], INDENT * block.get("level", 0)))
         else:
             parts.append(render_exec(block["exec"]))
     return "\n\n".join(parts) + "\n"
@@ -105,7 +107,7 @@ def render(lab):
 # --- run ------------------------------------------------------------------
 
 
-def shell(cmd, cwd):
+def shell(cmd, cwd, env=None):
     try:
         proc = subprocess.run(
             ["bash", "-o", "pipefail", "-c", cmd],
@@ -113,6 +115,7 @@ def shell(cmd, cwd):
             capture_output=True,
             text=True,
             timeout=TIMEOUT,
+            env={**os.environ, **(env or {})},
         )
     except subprocess.TimeoutExpired:
         return 124, f"timed out after {TIMEOUT}s"
@@ -132,8 +135,11 @@ def code_ok(expect, code):
 
 def run_lab(path, lab, update):
     findings = []
+    # 受講者が手で設定するシェル変数。コマンドごとにプロセスが分かれるので
+    # export で引き継ぐ
+    env = {k: str(v) for k, v in (lab.get("env") or {}).items()}
     for cmd in lab.get("setup", []):
-        shell(cmd, path)
+        shell(cmd, path, env)
     try:
         for block in lab["blocks"]:
             ex = block.get("exec")
@@ -153,8 +159,8 @@ def run_lab(path, lab, update):
                 # README には出さず、受講者が手でやっていること (起動を待つ、
                 # マニフェストを書き換える) を自動実行側で埋める
                 for prep in command.get("before") or []:
-                    shell(prep, path)
-                code, actual = shell(command["run"], path)
+                    shell(prep, path, env)
+                code, actual = shell(command["run"], path, env)
                 expect = command.get("expect", "success")
                 entry = {"run": command["run"], "code": code, "actual": actual}
                 if not code_ok(expect, code):
@@ -177,7 +183,7 @@ def run_lab(path, lab, update):
                     command["output"] = LiteralScalarString(actual + "\n" if actual else "")
     finally:
         for cmd in lab.get("teardown", []):
-            shell(cmd, path)
+            shell(cmd, path, env)
     return findings
 
 

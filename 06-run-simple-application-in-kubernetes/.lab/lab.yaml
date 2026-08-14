@@ -1,0 +1,346 @@
+# 受講者は `namespace=<yourname>` を手で打つ。自動実行では固定値を渡す
+env:
+  namespace: naka
+
+teardown:
+  - kubectl delete ns naka database --ignore-not-found
+
+blocks:
+  - md: |
+      # Deploy Simple Application in Kubernetes
+
+      ## Diagram
+      ### Application
+
+      ![](diagram.drawio.svg)
+      ### Kubernetes Objects
+
+      ![](kubernetes-object.drawio.svg)
+
+      ## Create MySQL (Deployment and Service) in database namespace
+
+      Notice: `StatefulSet` is more preferable resource to manage database applications, but just for simplicity `Deployment` is used for MySQL here.
+
+  - exec:
+      desc: Create `database` namespace.
+      commands:
+        - run: kubectl create namespace database
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check your namespace exists
+      style: combined
+      commands:
+        - run: kubectl get ns database
+          output: |
+            NAME       STATUS   AGE
+            database   Active   9s
+
+  - exec:
+      desc: Create Deployment for MySQL.
+      commands:
+        - run: kubectl apply -f mysql-deployment.yaml -n database
+
+  - md: |
+      <details><summary>how to create the yaml easily</summary>
+
+      Create base yaml file:
+    level: 1
+
+  - exec:
+      commands:
+        - run: kubectl create deploy mysql --image=mysql:8 --dry-run=client -o yaml > mysql-deployment.yaml
+          skip: 実行すると env を足した完成版の mysql-deployment.yaml を上書きする
+
+  - md: |
+      Add required `env`:
+
+      ```yaml
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: password
+            - name: MYSQL_DATABASE
+              value: test_db
+            - name: MYSQL_USER
+              value: sample_app
+            - name: MYSQL_PASSWORD
+              value: password
+      ```
+
+      </details>
+    level: 1
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check `Deployment` in database `Namespace`
+      commands:
+        - run: kubectl get deploy -n database
+          before:
+            - kubectl rollout status deployment/mysql -n database --timeout=180s
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check `ReplicaSet` in database `Namespace`
+      commands:
+        - run: kubectl describe replicaset -n database
+
+  - md: |
+      <details><summary>result</summary>
+
+          ...
+          Controlled By:  Deployment/mysql
+          ...
+
+      </details>
+    level: 2
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check `Pod` in database `Namespace`
+      commands:
+        - run: kubectl get pods -n database
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check if you can connect to MySQL with `kubectl exec`
+      commands:
+        - run: kubectl exec -n database -it $(kubectl get po -n database | grep mysql | head -1 | awk '{print $1}') -- mysql -uroot -ppassword
+          skip: 対話クライアントなので自動実行できない
+
+  - md: |
+      <details><summary>result</summary>
+
+      ```sql
+      mysql: [Warning] Using a password on the command line interface can be insecure.
+      Welcome to the MySQL monitor.  Commands end with ; or \g.
+      Your MySQL connection id is 8
+      Server version: 8.0.31 MySQL Community Server - GPL
+
+      Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+      Oracle is a registered trademark of Oracle Corporation and/or its
+      affiliates. Other names may be trademarks of their respective
+      owners.
+
+      Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+      mysql>
+      ```
+
+      </details>
+    level: 2
+
+  - exec:
+      desc: Create Service for MySQL.
+
+  - exec:
+      level: 2
+      desc: Create `Service`.
+      commands:
+        - run: kubectl create -f mysql-service.yaml -n database
+
+  - md: |
+      <details><summary>how to create the yaml easily</summary>
+
+      ```
+      kubectl create service clusterip mysql --tcp=3306 --dry-run=client --output yaml > mysql-service.yaml
+      ```
+
+      </details>
+    level: 2
+
+  - exec:
+      level: 3
+      marker: '- [ ]'
+      desc: Check the created `Service`
+      commands:
+        - run: kubectl get service -n database
+
+  - md: |
+      ## Create sample application (Deployment, ConfigMap, Secret, and Service) in your namespace
+
+      Sample application: https://github.com/nakamasato/fastapi-sample
+
+  - exec:
+      desc: Set your name to `namespace` variable.
+      commands:
+        - run: namespace=<yourname>
+          skip: 受講者が自分の名前を入れるプレースホルダ
+
+  - exec:
+      desc: Create your namespace.
+      commands:
+        - run: kubectl create namespace $namespace
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check your namespace exists
+      style: combined
+      commands:
+        - run: kubectl get ns $namespace
+          output: |
+            NAME   STATUS   AGE
+            naka   Active   71m
+
+  - exec:
+      desc: Create `Deployment` yaml.
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Create Deployemnt yaml with container image to `ghcr.io/nakamasato/fastapi-sample:v1.0`.
+      commands:
+        - run: kubectl create deploy sample-app --image=ghcr.io/nakamasato/fastapi-sample:v1.0 --dry-run=client -o yaml > sample-app-deployment.yaml
+          skip: 実行すると envFrom を足した完成版の sample-app-deployment.yaml を上書きする
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Set environment variables from `ConfigMap`.
+
+  - md: |
+      ```yaml
+      envFrom:
+        - configMapRef:
+            name: sample-app
+      ```
+    level: 2
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Set environment variable from `Secret`.
+
+  - md: |
+      ```yaml
+      envFrom:
+        ..
+        - secretRef:
+            name: sample-app
+      ```
+    level: 2
+
+  - exec:
+      desc: Create `ConfigMap` yaml.
+
+  - exec:
+      level: 2
+      desc: Prepare `env.txt`.
+
+  - md: |
+      ```
+      MYSQL_HOST=mysql.database.svc.cluster.local
+      MYSQL_DATABASE=test_db
+      MYSQL_USER=sample_app
+      ```
+    level: 2
+
+  - exec:
+      level: 2
+      desc: Create yaml from `env.txt`.
+      commands:
+        - run: kubectl create cm sample-app --from-env-file=env.txt --dry-run=client -o yaml > sample-app-configmap.yaml
+
+  - exec:
+      desc: Create `Secret` yaml.
+      commands:
+        - run: kubectl create secret generic sample-app --from-literal=MYSQL_PASSWORD=password --dry-run=client -o yaml > sample-app-secret.yaml
+
+  - exec:
+      desc: Apply `Deployment`, `ConfigMap`, and `Secret`.
+      commands:
+        - run: kubectl apply -f sample-app-deployment.yaml,sample-app-configmap.yaml,sample-app-secret.yaml -n $namespace
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check `Deployment` in your namespace
+      commands:
+        - run: kubectl get deploy -n $namespace
+          before:
+            - kubectl rollout status deployment/sample-app -n $namespace --timeout=180s
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check `Pod` in your namespace
+      commands:
+        - run: kubectl get pods -n $namespace
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check `ConfigMap` in your namespace
+      commands:
+        - run: kubectl get cm -n $namespace
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check `Secret` in your namespace
+      commands:
+        - run: kubectl get secret -n $namespace
+
+  - exec:
+      desc: Apply `Service`.
+      commands:
+        - run: kubectl apply -f sample-app-service.yaml -n $namespace
+
+  - md: |
+      <details><summary>How to create the yaml easily</summary>
+
+          kubectl create service clusterip sample-app --tcp=80 --dry-run=client -o yaml > sample-app-service.yaml
+
+      </details>
+    level: 1
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check the created `Service`
+      commands:
+        - run: kubectl get service -n $namespace
+
+  - exec:
+      level: 2
+      marker: '- [ ]'
+      desc: Check accessibility with `kubectl port-forward`
+      commands:
+        - run: kubectl port-forward svc/sample-app 8080:80 -n $namespace
+          skip: 手動で止めるまで終わらないので自動実行できない
+
+  - exec:
+      level: 2
+      style: combined
+      commands:
+        - run: curl http://localhost:8080/
+          skip: port-forward が前提なので自動実行できない
+          example: |
+            {"message":"Hello World"}
+
+  - md: |
+      http://localhost:8080/docs
+
+      <details><summary>result</summary>
+
+      ![](https://github.com/nakamasato/fastapi-sample/blob/c91117165e1babe07a3d42310876f727058ae6a0/docs/fast-api.png)
+
+      </details>
+    level: 2
+
+  - md: |
+      ## Clean up resources
+
+  - exec:
+      list: false
+      commands:
+        - run: kubectl delete -f sample-app-deployment.yaml,sample-app-configmap.yaml,sample-app-secret.yaml,sample-app-service.yaml -n $namespace
+        - run: kubectl delete -f mysql-deployment.yaml,mysql-service.yaml -n database
+        - run: kubectl delete ns $namespace
+        - run: kubectl delete ns database
