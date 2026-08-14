@@ -1,0 +1,103 @@
+teardown:
+  - kubectl delete -f secret-env-var.yaml --ignore-not-found
+  - kubectl delete -f secret-file.yaml --ignore-not-found
+
+blocks:
+  - md: |
+      # Secret
+
+      ## Environment variables
+
+  - exec:
+      desc: apply
+      commands:
+        - run: kubectl apply -f secret-env-var.yaml
+
+  - exec:
+      desc: check with logs
+      commands:
+        - run: kubectl logs test-pod
+          before:
+            - kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/test-pod --timeout=120s
+
+  - exec:
+      note: |
+        -> you can see `username=admin` and `password=xxx` in the environment variables.
+
+  - exec:
+      desc: Delete
+      commands:
+        - run: kubectl delete -f secret-env-var.yaml
+
+  - md: |
+      ## Mount file
+
+      data.csv
+
+      ```csv
+      name,age,email,password
+      naka,1,naka@example.com,j4gn43g4gr
+      tanaka,2,tanaka@example.com,8j437fkw3v
+      ```
+
+  - exec:
+      desc: Encode `data.csv`
+      style: combined
+      commands:
+        - run: |-
+            echo -n 'name,age,email,password
+            naka,1,naka@example.com,j4gn43g4gr
+            tanaka,2,tanaka@example.com,8j437fkw3v' | base64
+          output: |
+            bmFtZSxhZ2UsZW1haWwscGFzc3dvcmQKbmFrYSwxLG5ha2FAZXhhbXBsZS5jb20sajRnbjQzZzRncgp0YW5ha2EsMix0YW5ha2FAZXhhbXBsZS5jb20sOGo0Mzdma3czdg==
+
+  - exec:
+      note: |
+        or
+      style: combined
+      commands:
+        - run: kubectl create secret generic mysecret --from-file=data.csv=data.csv -o yaml --dry-run=client
+          output: |
+            apiVersion: v1
+            data:
+              data.csv: bmFtZSxhZ2UsZW1haWwscGFzc3dvcmQKbmFrYSwxLG5ha2FAZXhhbXBsZS5jb20sajRnbjQzZzRncgp0YW5ha2EsMix0YW5ha2FAZXhhbXBsZS5jb20sOGo0Mzdma3czdgo=
+            kind: Secret
+            metadata:
+              name: mysecret
+
+  - exec:
+      desc: Apply
+      commands:
+        - run: kubectl apply -f secret-file.yaml
+
+  - exec:
+      desc: Check
+      commands:
+        - run: kubectl exec -it test-pod sh
+          skip: 対話シェルなので自動実行できない
+
+  - exec:
+      note: |
+        inside the container
+      commands:
+        - run: ls
+          skip: コンテナの中で打つコマンド
+        - run: ls datadir
+          skip: コンテナの中で打つコマンド
+        - run: cat datadir/data.csv
+          skip: コンテナの中で打つコマンド
+
+  - exec:
+      desc: Delete
+      commands:
+        - run: kubectl delete -f secret-file.yaml
+
+  - md: |
+      ## Others
+
+      Create secret with `--from-literal`
+
+  - exec:
+      list: false
+      commands:
+        - run: kubectl create secret generic mysecret --from-literal=username=admin --from-literal=password=1f2d1e2e67df -o yaml --dry-run=client

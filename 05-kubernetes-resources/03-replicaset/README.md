@@ -5,6 +5,7 @@
     ```
     kubectl apply -f replicaset.yaml
     ```
+
 1. Check replicaset and pod
 
     ```
@@ -36,6 +37,7 @@
     ```
 
     check pods:
+
     ```
     kubectl get pods
     ```

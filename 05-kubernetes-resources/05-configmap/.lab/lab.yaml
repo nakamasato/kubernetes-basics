@@ -1,0 +1,67 @@
+teardown:
+  - kubectl delete -f configmap-env-var.yaml --ignore-not-found
+  - kubectl delete -f configmap-file.yaml --ignore-not-found
+
+blocks:
+  - md: |
+      # ConfigMap
+
+  - exec:
+      desc: Apply configmap and pods to set environment variables.
+      commands:
+        - run: kubectl apply -f configmap-env-var.yaml
+
+  - exec:
+      commands:
+        - run: kubectl get pod
+          before:
+            - kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/test-pod --timeout=120s
+
+  - exec:
+      note: |
+        -> `COMPLETED`
+      commands:
+        - run: kubectl logs test-pod
+
+  - exec:
+      note: |
+        -> `TEST_ENV=test`
+
+        delete:
+      commands:
+        - run: kubectl delete -f configmap-env-var.yaml
+
+  - exec:
+      desc: Apply configmap and pods to read file set in configmap.
+      commands:
+        - run: kubectl apply -f configmap-file.yaml
+
+  - exec:
+      commands:
+        - run: kubectl get pod
+          before:
+            - kubectl wait --for=condition=Ready pod/test-pod --timeout=120s
+
+  - exec:
+      commands:
+        - run: kubectl exec -it test-pod sh
+          skip: 対話シェルなので自動実行できない
+
+  - exec:
+      note: |
+        inside the container:
+      commands:
+        - run: ls
+          skip: コンテナの中で打つコマンド
+        - run: ls datadir
+          skip: コンテナの中で打つコマンド
+        - run: cat datadir/data.csv
+          skip: コンテナの中で打つコマンド
+
+  - exec:
+      note: |
+        you can read data.csv defined in configmap.
+
+        delete:
+      commands:
+        - run: kubectl delete -f configmap-file.yaml

@@ -1,0 +1,123 @@
+teardown:
+  - kubectl delete -f deployment.yaml --ignore-not-found
+  # 手順5で書き換えたイメージを戻す。次回の実行が同じ状態から始まるようにする
+  - perl -pi -e 's|nginx:1\.15|nginx:1.16|' deployment.yaml
+
+blocks:
+  - md: |
+      # Deployment
+
+  - exec:
+      desc: Create Deployment
+      commands:
+        - run: kubectl apply -f deployment.yaml
+
+  - exec:
+      desc: Check
+      commands:
+        - run: kubectl get deployment
+
+  - exec:
+      commands:
+        - run: kubectl get replicaset
+
+  - exec:
+      commands:
+        - run: kubectl get replicaset nginx-xxxx -o yaml
+          skip: ReplicaSet 名が毎回変わるプレースホルダ
+
+  - exec:
+      note: |
+        - You can see the replicaset is created by `Deployment` in `ownerReferences` field.
+        - You can also see `pod-template-hash`, which is added by `Deployment`.
+      commands:
+        - run: kubectl get pod
+
+  - exec:
+      desc: Change replicas
+      note: |
+        1. Update `replicas: 2` in `deployment.yaml`
+
+        1. Apply it
+
+  - exec:
+      level: 2
+      commands:
+        - run: kubectl apply -f deployment.yaml
+
+  - exec:
+      level: 2
+      note: |
+        rollout isn't triggered as `replica` is not in the pod template.
+
+  - exec:
+      desc: Change image by command
+      commands:
+        - run: kubectl set image deployment/nginx nginx=nginx:1.15
+
+  - exec:
+      note: |
+        check:
+      commands:
+        - run: kubectl get rs
+
+  - exec:
+      note: |
+        You can see two replicasets; one is old one, the other is new one.
+
+  - exec:
+      desc: Change image by updating yaml file.
+      note: |
+        1. Change `nginx:1.16` -> `nginx:1.15` in deployment.yaml
+
+        1. Apply it
+
+  - exec:
+      level: 2
+      commands:
+        - run: kubectl apply -f deployment.yaml
+          before:
+            - perl -pi -e 's|nginx:1\.16|nginx:1.15|' deployment.yaml
+
+  - exec:
+      level: 2
+      desc: You can check the replicasets
+      commands:
+        - run: kubectl get replicaset
+
+  - exec:
+      level: 2
+      note: |
+        -> 3 replicasets
+
+  - exec:
+      desc: Rollback
+      commands: []
+
+  - exec:
+      level: 2
+      desc: Check rollout history.
+      commands:
+        - run: kubectl rollout history deployment.v1.apps/nginx
+
+  - exec:
+      level: 2
+      desc: Roll back to the revision 2
+      commands:
+        - run: kubectl rollout undo deployment.v1.apps/nginx --to-revision=2
+
+  - exec:
+      level: 2
+      desc: Check replicaset
+      commands:
+        - run: kubectl get rs
+
+  - exec:
+      level: 2
+      note: |
+        -> replicaset with `nginx:1.15` has running pods.
+
+  - exec:
+      desc: Delete the resources
+      commands:
+        - run: kubectl delete -f deployment.yaml

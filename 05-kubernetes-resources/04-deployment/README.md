@@ -34,7 +34,7 @@
     1. Apply it
 
         ```
-        kubectl apply deployment.yaml
+        kubectl apply -f deployment.yaml
         ```
 
         rollout isn't triggered as `replica` is not in the pod template.
@@ -55,13 +55,14 @@
 
 1. Change image by updating yaml file.
 
-    1. Change `nginx:1.14` -> `nginx:1.15`  in deployment.yaml
+    1. Change `nginx:1.16` -> `nginx:1.15` in deployment.yaml
 
     1. Apply it
 
         ```
         kubectl apply -f deployment.yaml
         ```
+
     1. You can check the replicasets
 
         ```

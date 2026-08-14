@@ -14,7 +14,7 @@ spec:
   restartPolicy: Never
   containers:
     - name: busybox
-      image: k8s.gcr.io/busybox
+      image: busybox
       command: [ "env" ] # print env var
       envFrom:
         - configMapRef:

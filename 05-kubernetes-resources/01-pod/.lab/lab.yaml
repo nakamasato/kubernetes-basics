@@ -20,13 +20,15 @@ blocks:
       commands:
         # 手で打つときは Running になるまで待つ間があるので、自動実行でも揃える
         - run: kubectl get pod nginx-yaml -o yaml > nginx-yaml.yaml
-          wait: kubectl wait --for=condition=Ready pod/nginx-yaml --timeout=120s
+          before:
+            - kubectl wait --for=condition=Ready pod/nginx-yaml --timeout=120s
 
   - exec:
       desc: Check the pod created by `kubectl run`
       commands:
         - run: kubectl get pod nginx -o yaml > nginx-kubectl-run.yaml
-          wait: kubectl wait --for=condition=Ready pod/nginx --timeout=120s
+          before:
+            - kubectl wait --for=condition=Ready pod/nginx --timeout=120s
 
   - exec:
       desc: Compare them.

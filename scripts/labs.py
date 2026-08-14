@@ -63,18 +63,19 @@ def indent_block(text, indent):
 
 def render_exec(ex):
     listed = ex.get("list", True)
-    indent = INDENT if listed else ""
+    indent = INDENT * ex.get("level", 1) if listed else ""
     combined = ex.get("style") == "combined"
     lang = ex.get("lang", "")
-    commands = ex["commands"]
+    commands = ex.get("commands") or []
     parts = []
 
     if ex.get("desc"):
-        parts.append(f"1. {ex['desc']}" if listed else ex["desc"])
+        outer = INDENT * (ex.get("level", 1) - 1) if listed else ""
+        parts.append(f"{outer}1. {ex['desc']}" if listed else ex["desc"])
     if ex.get("note"):
         parts.append(indent_block(ex["note"], indent))
 
-    if not combined:
+    if commands and not combined:
         parts.append(fence("\n".join(c["run"] for c in commands), lang, indent))
 
     shown = [(c, c.get("output") or c.get("example")) for c in commands]
@@ -105,13 +106,16 @@ def render(lab):
 
 
 def shell(cmd, cwd):
-    proc = subprocess.run(
-        ["bash", "-o", "pipefail", "-c", cmd],
-        cwd=cwd,
-        capture_output=True,
-        text=True,
-        timeout=TIMEOUT,
-    )
+    try:
+        proc = subprocess.run(
+            ["bash", "-o", "pipefail", "-c", cmd],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            timeout=TIMEOUT,
+        )
+    except subprocess.TimeoutExpired:
+        return 124, f"timed out after {TIMEOUT}s"
     merged = proc.stdout + proc.stderr
     # 表出力の行末空白を落とす。YAML のリテラルブロックが使えなくなるため
     body = "\n".join(line.rstrip() for line in merged.rstrip("\n").split("\n"))
@@ -135,9 +139,21 @@ def run_lab(path, lab, update):
             ex = block.get("exec")
             if not ex:
                 continue
-            for command in ex["commands"]:
-                if command.get("wait"):
-                    shell(command["wait"], path)
+            for command in ex.get("commands") or []:
+                if command.get("skip"):
+                    findings.append(
+                        {
+                            "run": command["run"],
+                            "code": "-",
+                            "status": "SKIP",
+                            "actual": command["skip"],
+                        }
+                    )
+                    continue
+                # README には出さず、受講者が手でやっていること (起動を待つ、
+                # マニフェストを書き換える) を自動実行側で埋める
+                for prep in command.get("before") or []:
+                    shell(prep, path)
                 code, actual = shell(command["run"], path)
                 expect = command.get("expect", "success")
                 entry = {"run": command["run"], "code": code, "actual": actual}
@@ -176,8 +192,14 @@ def yaml_io():
     return io
 
 
+# kubectl apply -f <dir> は非再帰なので、サブディレクトリに置けば
+# 教材の演習で lab.yaml がマニフェストとして読まれることがない
+def lab_path(path):
+    return path / ".lab" / "lab.yaml"
+
+
 def load(path):
-    return yaml_io().load(path / "lab.yaml")
+    return yaml_io().load(lab_path(path))
 
 
 def main():
@@ -213,16 +235,18 @@ def main():
         elif args.command == "run":
             print(f"=== {path} ===")
             for entry in run_lab(path, lab, args.update):
-                if entry["status"] != "OK":
+                if entry["status"] in ("FAIL", "DRIFT"):
                     failed = True
                 print(f"{entry['status']:5} ({entry['code']}) {entry['run']}")
-                if entry["status"] == "FAIL":
+                if entry["status"] == "SKIP":
+                    print(f"{INDENT}{entry['actual']}")
+                elif entry["status"] == "FAIL":
                     print(indent_block(entry["actual"], INDENT))
                 elif entry["status"] == "DRIFT":
                     print(indent_block(entry["diff"], INDENT))
             if args.update:
-                yaml_io().dump(lab, path / "lab.yaml")
-                print(f"updated {path / 'lab.yaml'}")
+                yaml_io().dump(lab, lab_path(path))
+                print(f"updated {lab_path(path)}")
 
     sys.exit(1 if failed else 0)
 
