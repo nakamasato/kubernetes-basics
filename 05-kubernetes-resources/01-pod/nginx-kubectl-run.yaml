@@ -1,13 +1,14 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  creationTimestamp: "2021-08-10T23:12:34Z"
+  creationTimestamp: "2026-08-14T14:46:17Z"
+  generation: 1
   labels:
     run: nginx
   name: nginx
   namespace: default
-  resourceVersion: "74214"
-  uid: a492f636-535a-4117-80a0-9abc4af15345
+  resourceVersion: "2479"
+  uid: 39d4fe06-630e-4874-81c4-084983277b98
 spec:
   containers:
   - image: nginx
@@ -18,11 +19,11 @@ spec:
     terminationMessagePolicy: File
     volumeMounts:
     - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-      name: kube-api-access-6vfnl
+      name: kube-api-access-wwsps
       readOnly: true
   dnsPolicy: ClusterFirst
   enableServiceLinks: true
-  nodeName: docker-desktop
+  nodeName: desktop-control-plane
   preemptionPolicy: PreemptLowerPriority
   priority: 0
   restartPolicy: Always
@@ -41,7 +42,7 @@ spec:
     operator: Exists
     tolerationSeconds: 300
   volumes:
-  - name: kube-api-access-6vfnl
+  - name: kube-api-access-wwsps
     projected:
       defaultMode: 420
       sources:
@@ -62,37 +63,55 @@ spec:
 status:
   conditions:
   - lastProbeTime: null
-    lastTransitionTime: "2021-08-10T23:12:34Z"
+    lastTransitionTime: "2026-08-14T14:46:22Z"
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-08-14T14:46:17Z"
     status: "True"
     type: Initialized
   - lastProbeTime: null
-    lastTransitionTime: "2021-08-10T23:12:38Z"
+    lastTransitionTime: "2026-08-14T14:46:22Z"
     status: "True"
     type: Ready
   - lastProbeTime: null
-    lastTransitionTime: "2021-08-10T23:12:38Z"
+    lastTransitionTime: "2026-08-14T14:46:22Z"
     status: "True"
     type: ContainersReady
   - lastProbeTime: null
-    lastTransitionTime: "2021-08-10T23:12:34Z"
+    lastTransitionTime: "2026-08-14T14:46:17Z"
     status: "True"
     type: PodScheduled
   containerStatuses:
-  - containerID: docker://b49d81708345a54f1218fdba81070cbdab16619299de1160eaec6968af884ffb
-    image: nginx:latest
-    imageID: docker-pullable://nginx@sha256:8f335768880da6baf72b70c701002b45f4932acae8d574dedfddaf967fc3ac90
+  - containerID: containerd://df2f039d855b7aa46e88b5558c89ed005962f63729e91b0bfa1a8485c6eea36b
+    image: docker.io/library/nginx:latest
+    imageID: docker.io/library/nginx@sha256:8541484afbc9c8a5a8a99b379568ebbc957f658583ec9448fc43104229c03cf8
     lastState: {}
     name: nginx
     ready: true
+    resources: {}
     restartCount: 0
     started: true
     state:
       running:
-        startedAt: "2021-08-10T23:12:37Z"
-  hostIP: 192.168.65.4
+        startedAt: "2026-08-14T14:46:21Z"
+    user:
+      linux:
+        gid: 0
+        supplementalGroups:
+        - 0
+        uid: 0
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-wwsps
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 172.18.0.3
+  hostIPs:
+  - ip: 172.18.0.3
   phase: Running
-  podIP: 10.1.0.7
+  podIP: 10.244.0.12
   podIPs:
-  - ip: 10.1.0.7
+  - ip: 10.244.0.12
   qosClass: BestEffort
-  startTime: "2021-08-10T23:12:34Z"
+  startTime: "2026-08-14T14:46:17Z"

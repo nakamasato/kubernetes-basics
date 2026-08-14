@@ -1,11 +1,15 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  creationTimestamp: "2021-08-10T23:10:55Z"
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"name":"nginx-yaml","namespace":"default"},"spec":{"containers":[{"image":"nginx","name":"nginx"}]}}
+  creationTimestamp: "2026-08-14T14:46:17Z"
+  generation: 1
   name: nginx-yaml
   namespace: default
-  resourceVersion: "74084"
-  uid: 3bc02c8e-fe9a-4d5b-b816-8e58377e5e2b
+  resourceVersion: "2472"
+  uid: 0043867b-abc4-48ff-8b88-493679c710e2
 spec:
   containers:
   - image: nginx
@@ -16,11 +20,11 @@ spec:
     terminationMessagePolicy: File
     volumeMounts:
     - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-      name: kube-api-access-p8rlz
+      name: kube-api-access-rpsjn
       readOnly: true
   dnsPolicy: ClusterFirst
   enableServiceLinks: true
-  nodeName: docker-desktop
+  nodeName: desktop-control-plane
   preemptionPolicy: PreemptLowerPriority
   priority: 0
   restartPolicy: Always
@@ -39,7 +43,7 @@ spec:
     operator: Exists
     tolerationSeconds: 300
   volumes:
-  - name: kube-api-access-p8rlz
+  - name: kube-api-access-rpsjn
     projected:
       defaultMode: 420
       sources:
@@ -60,37 +64,55 @@ spec:
 status:
   conditions:
   - lastProbeTime: null
-    lastTransitionTime: "2021-08-10T23:10:55Z"
+    lastTransitionTime: "2026-08-14T14:46:20Z"
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-08-14T14:46:17Z"
     status: "True"
     type: Initialized
   - lastProbeTime: null
-    lastTransitionTime: "2021-08-10T23:10:59Z"
+    lastTransitionTime: "2026-08-14T14:46:20Z"
     status: "True"
     type: Ready
   - lastProbeTime: null
-    lastTransitionTime: "2021-08-10T23:10:59Z"
+    lastTransitionTime: "2026-08-14T14:46:20Z"
     status: "True"
     type: ContainersReady
   - lastProbeTime: null
-    lastTransitionTime: "2021-08-10T23:10:55Z"
+    lastTransitionTime: "2026-08-14T14:46:17Z"
     status: "True"
     type: PodScheduled
   containerStatuses:
-  - containerID: docker://7dc65e0a60261002faa0847c565bb9d8d515aebc77ff31b7b8d1e5714757992c
-    image: nginx:latest
-    imageID: docker-pullable://nginx@sha256:8f335768880da6baf72b70c701002b45f4932acae8d574dedfddaf967fc3ac90
+  - containerID: containerd://f0ab0d11882fdd1acc458d3e3469eaf57f2ce89451e56f1434217b82a4648a51
+    image: docker.io/library/nginx:latest
+    imageID: docker.io/library/nginx@sha256:8541484afbc9c8a5a8a99b379568ebbc957f658583ec9448fc43104229c03cf8
     lastState: {}
     name: nginx
     ready: true
+    resources: {}
     restartCount: 0
     started: true
     state:
       running:
-        startedAt: "2021-08-10T23:10:59Z"
-  hostIP: 192.168.65.4
+        startedAt: "2026-08-14T14:46:20Z"
+    user:
+      linux:
+        gid: 0
+        supplementalGroups:
+        - 0
+        uid: 0
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-rpsjn
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 172.18.0.3
+  hostIPs:
+  - ip: 172.18.0.3
   phase: Running
-  podIP: 10.1.0.6
+  podIP: 10.244.0.11
   podIPs:
-  - ip: 10.1.0.6
+  - ip: 10.244.0.11
   qosClass: BestEffort
-  startTime: "2021-08-10T23:10:55Z"
+  startTime: "2026-08-14T14:46:17Z"
