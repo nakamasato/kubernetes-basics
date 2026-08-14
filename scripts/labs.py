@@ -32,17 +32,35 @@ VOLATILE = [
     (re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b"), "<UID>"),
     (re.compile(r"\b(?:docker|containerd|cri-o)://[0-9a-f]{64}"), "<CONTAINER_ID>"),
     (re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z"), "<TIMESTAMP>"),
+    # kubectl describe は ISO ではなく RFC 1123 で出す
+    (
+        re.compile(
+            r"\b(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} [+-]\d{4}"
+        ),
+        "<TIMESTAMP>",
+    ),
+    (re.compile(r"\b[0-9a-f]{1,4}(?::[0-9a-f]{0,4}){3,7}\b"), "<IP>"),
     (re.compile(r'(?<=resourceVersion: ")\d+'), "<RV>"),
     (re.compile(r"\b(?:10|172|192)\.\d{1,3}\.\d{1,3}\.\d{1,3}\b"), "<IP>"),
     (re.compile(r"\b\d+[smhd](?:\d+[smhd])?\b"), "<AGE>"),
     (re.compile(r"^\d+(?:,\d+)?[acd]\d+(?:,\d+)?$", re.M), "<DIFF_RANGE>"),
+    # 引けないイメージの Pod は2つの状態を行き来する。文字数が違うので
+    # 揃えないと kubectl get の表の列幅が毎回ずれる
+    (re.compile(r"\b(?:ErrImagePull|ImagePullBackOff)\b"), "<PULL_ERROR>"),
+    # 行頭のインデントは意味を持つので残し、行中の桁揃えだけ潰す
+    (re.compile(r"(?<=\S) {2,}"), " "),
 ]
 
 
-def normalize(text):
-    for pattern, repl in VOLATILE:
+def normalize(text, extra=()):
+    for pattern, repl in list(extra) + VOLATILE:
         text = pattern.sub(repl, text)
     return "\n".join(line.rstrip() for line in text.strip().split("\n"))
+
+
+def lab_masks(lab):
+    """lab.yaml の mask:。汎用ルールでは判別できない、その演習だけの揮発値。"""
+    return [(re.compile(m["pattern"]), m["as"]) for m in lab.get("mask") or []]
 
 
 # --- render ---------------------------------------------------------------
@@ -138,6 +156,7 @@ def run_lab(path, lab, update):
     # 受講者が手で設定するシェル変数。コマンドごとにプロセスが分かれるので
     # export で引き継ぐ
     env = {k: str(v) for k, v in (lab.get("env") or {}).items()}
+    masks = lab_masks(lab)
     for cmd in lab.get("setup", []):
         shell(cmd, path, env)
     try:
@@ -165,12 +184,14 @@ def run_lab(path, lab, update):
                 entry = {"run": command["run"], "code": code, "actual": actual}
                 if not code_ok(expect, code):
                     entry["status"] = "FAIL"
-                elif command.get("output") and normalize(command["output"]) != normalize(actual):
+                elif command.get("output") and normalize(command["output"], masks) != normalize(
+                    actual, masks
+                ):
                     entry["status"] = "DRIFT"
                     entry["diff"] = "".join(
                         difflib.unified_diff(
-                            (normalize(command["output"]) + "\n").splitlines(True),
-                            (normalize(actual) + "\n").splitlines(True),
+                            (normalize(command["output"], masks) + "\n").splitlines(True),
+                            (normalize(actual, masks) + "\n").splitlines(True),
                             "expected",
                             "actual",
                             lineterm="\n",
