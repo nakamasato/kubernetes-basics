@@ -6,8 +6,29 @@ mask:
   # EndpointSlice が直近で変わったかどうかで付いたり付かなかったりする
   - pattern: 'Annotations: +endpoints\.kubernetes\.io/last-change-trigger-time: \S+'
     as: 'Annotations:  <none>'
+  # このセクションだけが kube-system の Pod をそのまま見せる。接尾辞はクラスタを
+  # 作り直すたびに変わり、ノードの識別子も同じ
+  - pattern: \b(coredns|local-path-provisioner)-[a-z0-9]+-[a-z0-9]{5}\b
+    as: \1-<POD>
+  - pattern: \b(kindnet|kube-proxy)-[a-z0-9]{5}\b
+    as: \1-<POD>
+  - pattern: \b[0-9a-f]{32}\b
+    as: <MACHINE_ID>
+  # ノードが自分のアドレスを IPv4 だけ報告したり IPv6 も足したりで揺れる。Pod の
+  # hostIPs は作られた瞬間の値を持ち続けるので、同じクラスタでも実行ごとに変わる
+  - pattern: '\n +- ip: fc00:[0-9a-f:]+'
+    as: ''
 
 setup:
+  # EndpointSlice はエンドポイントを足された順に並べる。まとめて apply すると
+  # nginx-1 と nginx-3 のどちらが先に載るかが実行ごとに変わるので、先に nginx-3
+  # だけを載せてから残りを作る
+  - kubectl apply -f pod-nginx-3.yaml -f service-nginx-1-with-selector-nginx.yaml
+  - |
+    for _ in $(seq 60); do
+      kubectl get endpointslice -l kubernetes.io/service-name=nginx-1 -o jsonpath='{.items[*].endpoints[*].targetRef.name}' | grep -q nginx-3 && break
+      sleep 1
+    done
   - kubectl apply -f .
   - kubectl wait --for=condition=Ready pod/nginx-3 --timeout=180s
   - kubectl wait --for=condition=Ready pod/nginx-4 -n test --timeout=180s
