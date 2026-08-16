@@ -41,7 +41,7 @@ tanaka,2,tanaka@example.com,8j437fkw3v
     bmFtZSxhZ2UsZW1haWwscGFzc3dvcmQKbmFrYSwxLG5ha2FAZXhhbXBsZS5jb20sajRnbjQzZzRncgp0YW5ha2EsMix0YW5ha2FAZXhhbXBsZS5jb20sOGo0Mzdma3czdg==
     ```
 
-    or
+    `kubectl create secret` encodes the file for you, but the value it prints is not the same:
 
     ```
     kubectl create secret generic mysecret --from-file=data.csv=data.csv -o yaml --dry-run=client
@@ -52,6 +52,10 @@ tanaka,2,tanaka@example.com,8j437fkw3v
     metadata:
       name: mysecret
     ```
+
+    The two values end differently: `...dg==` above, `...dgo=` here. `data.csv` ends with a
+    newline, and `--from-file` encodes the file byte for byte, while `echo -n` leaves that
+    newline out. `secret-file.yaml` carries the `echo -n` value.
 
 1. Apply
 
