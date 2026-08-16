@@ -1,5 +1,7 @@
 teardown:
   - kubectl delete pod nginx --ignore-not-found
+  - kubectl delete pod pod-test --ignore-not-found
+  - kubectl delete namespace test-ns --ignore-not-found
 
 blocks:
   - md: |
@@ -32,6 +34,128 @@ blocks:
       desc: Run nginx pod in default namespace.
       commands:
         - run: kubectl run nginx --image=nginx
+
+  - md: |
+      ## Create and delete resources
+
+      `create` and `delete` take two forms.
+
+      - `kubectl create|delete -f FILENAME` — write what you want in a file and pass the file
+      - `kubectl create|delete TYPE NAME [flags]` — name the resource on the command line
+
+      ### From a file
+
+      [pod-test.yaml](pod-test.yaml) describes one Pod. What each field means is covered in the
+      next lecture.
+
+  - exec:
+      desc: Create
+      style: combined
+      commands:
+        - run: kubectl create -f pod-test.yaml
+          output: |
+            pod/pod-test created
+
+
+  - exec:
+      desc: Check. `-f` takes the same file, so you do not have to name the Pod.
+      style: combined
+      commands:
+        - run: kubectl get pod
+          output: |
+            NAME       READY   STATUS    RESTARTS   AGE
+            nginx      1/1     Running   0          5s
+            pod-test   1/1     Running   0          5s
+          before:
+            - kubectl wait --for=condition=Ready pod/pod-test --timeout=120s
+        - run: kubectl get -f pod-test.yaml
+          output: |
+            NAME       READY   STATUS    RESTARTS   AGE
+            pod-test   1/1     Running   0          5s
+
+
+  - exec:
+      desc: Delete
+      style: combined
+      commands:
+        - run: kubectl delete -f pod-test.yaml
+          output: |
+            pod "pod-test" deleted from default namespace
+        - run: kubectl get pod
+          output: |
+            NAME    READY   STATUS    RESTARTS   AGE
+            nginx   1/1     Running   0          8s
+
+
+  - md: |
+      ### From the command line
+
+    level: 0
+
+  - exec:
+      desc: Create
+      style: combined
+      commands:
+        - run: kubectl create namespace test-ns
+          output: |
+            namespace/test-ns created
+
+
+  - exec:
+      desc: Check. `ns` is the short name for `namespace`.
+      style: combined
+      commands:
+        - run: kubectl get ns test-ns
+          output: |
+            NAME      STATUS   AGE
+            test-ns   Active   0s
+
+
+  - exec:
+      desc: Delete
+      style: combined
+      commands:
+        - run: kubectl delete namespace test-ns
+          output: |
+            namespace "test-ns" deleted
+
+
+  - md: |
+      `kubectl create -h` lists what you can create this way — `configmap`, `deployment`,
+      `namespace`, `secret`, `service` and a dozen more. Anything not on that list needs a file.
+
+  - exec:
+      list: false
+      commands:
+        - run: kubectl create -h
+
+  - md: |
+      ### Build a manifest with `--dry-run`
+
+      `--dry-run=client` stops before the request reaches the API server. Combined with `-o yaml`
+      it prints the manifest the command would have sent, which makes a good starting point.
+
+  - exec:
+      list: false
+      style: combined
+      commands:
+        - run: kubectl create namespace test-ns --dry-run=client -o yaml
+          output: |
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: test-ns
+            spec: {}
+            status: {}
+
+
+  - md: |
+      Redirect it to a file and edit from there.
+
+  - exec:
+      list: false
+      commands:
+        - run: kubectl create namespace test-ns --dry-run=client -o yaml > test-ns.yaml
 
   - md: |
       ## Reference
