@@ -29,6 +29,13 @@ Please check [03-environment-setup](../03-environment-setup)
     kubectl run nginx --image=nginx
     ```
 
+1. Delete the nginx pod.
+
+    ```
+    kubectl delete pod nginx
+    pod "nginx" deleted from default namespace
+    ```
+
 ## Create and delete resources
 
 `create` and `delete` take two forms.
@@ -53,8 +60,7 @@ next lecture.
     ```
     kubectl get pod
     NAME       READY   STATUS    RESTARTS   AGE
-    nginx      1/1     Running   0          5s
-    pod-test   1/1     Running   0          5s
+    pod-test   1/1     Running   0          4s
     ```
 
     ```
@@ -72,8 +78,7 @@ next lecture.
 
     ```
     kubectl get pod
-    NAME    READY   STATUS    RESTARTS   AGE
-    nginx   1/1     Running   0          8s
+    No resources found in default namespace.
     ```
 
 ### From the command line

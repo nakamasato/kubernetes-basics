@@ -35,6 +35,15 @@ blocks:
       commands:
         - run: kubectl run nginx --image=nginx
 
+  - exec:
+      desc: Delete the nginx pod.
+      style: combined
+      commands:
+        - run: kubectl delete pod nginx
+          output: |
+            pod "nginx" deleted from default namespace
+
+
   - md: |
       ## Create and delete resources
 
@@ -64,8 +73,7 @@ blocks:
         - run: kubectl get pod
           output: |
             NAME       READY   STATUS    RESTARTS   AGE
-            nginx      1/1     Running   0          5s
-            pod-test   1/1     Running   0          5s
+            pod-test   1/1     Running   0          4s
           before:
             - kubectl wait --for=condition=Ready pod/pod-test --timeout=120s
         - run: kubectl get -f pod-test.yaml
@@ -83,8 +91,7 @@ blocks:
             pod "pod-test" deleted from default namespace
         - run: kubectl get pod
           output: |
-            NAME    READY   STATUS    RESTARTS   AGE
-            nginx   1/1     Running   0          8s
+            No resources found in default namespace.
 
 
   - md: |
