@@ -157,10 +157,10 @@ Sample application: https://github.com/nakamasato/fastapi-sample
 
 1. Create `Deployment` yaml.
 
-    - [ ] Create Deployemnt yaml with container image to `ghcr.io/nakamasato/fastapi-sample:v1.0`.
+    - [ ] Create Deployemnt yaml with container image to `ghcr.io/nakamasato/fastapi-sample:v1.1`.
 
         ```
-        kubectl create deploy sample-app --image=ghcr.io/nakamasato/fastapi-sample:v1.0 --dry-run=client -o yaml > sample-app-deployment.yaml
+        kubectl create deploy sample-app --image=ghcr.io/nakamasato/fastapi-sample:v1.1 --dry-run=client -o yaml > sample-app-deployment.yaml
         ```
 
     - [ ] Set environment variables from `ConfigMap`.
