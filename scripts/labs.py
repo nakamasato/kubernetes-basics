@@ -13,6 +13,7 @@
 
 import argparse
 import difflib
+import json
 import os
 import re
 import subprocess
@@ -151,7 +152,42 @@ def code_ok(expect, code):
     return code == 0
 
 
-def run_lab(path, lab, update):
+VERSIONS = Path(__file__).resolve().parent.parent / "kubernetes-versions.json"
+
+
+def output_changes():
+    """output は kubernetes-versions.json の先頭のバージョンで記録する。いまのサーバーが
+    それより古ければ、そのあとに入った変更を戻した出力がこのバージョンでの正解になる"""
+    proc = subprocess.run(
+        ["kubectl", "version", "-o", "json"], capture_output=True, text=True, check=True
+    )
+    minor = int(json.loads(proc.stdout)["serverVersion"]["minor"].rstrip("+"))
+    return [
+        (re.compile(c["new"]), c["old"])
+        for c in json.loads(VERSIONS.read_text())["output_changes"]
+        if minor < int(c["since"].split(".")[1])
+    ]
+
+
+DOCS = VERSIONS.parent / "docs" / "labs.md"
+TABLE = re.compile(r"(<!-- output_changes -->\n).*?(?=<!-- /output_changes -->)", re.S)
+
+
+def with_changes_table(text):
+    rows = ["| Since | Change |", "| --- | --- |"] + [
+        f"| {c['since']} | {c['change']} |"
+        for c in json.loads(VERSIONS.read_text())["output_changes"]
+    ]
+    return TABLE.sub(lambda m: m.group(1) + "\n".join(rows) + "\n", text)
+
+
+def for_this_version(output, changes):
+    for pattern, old in changes:
+        output = pattern.sub(old, output)
+    return output
+
+
+def run_lab(path, lab, update, changes):
     findings = []
     # 受講者が手で設定するシェル変数。コマンドごとにプロセスが分かれるので
     # export で引き継ぐ
@@ -184,13 +220,16 @@ def run_lab(path, lab, update):
                 entry = {"run": command["run"], "code": code, "actual": actual}
                 if not code_ok(expect, code):
                     entry["status"] = "FAIL"
-                elif command.get("output") and normalize(command["output"], masks) != normalize(
-                    actual, masks
-                ):
+                elif command.get("output") and normalize(
+                    for_this_version(command["output"], changes), masks
+                ) != normalize(actual, masks):
                     entry["status"] = "DRIFT"
                     entry["diff"] = "".join(
                         difflib.unified_diff(
-                            (normalize(command["output"], masks) + "\n").splitlines(True),
+                            (
+                                normalize(for_this_version(command["output"], changes), masks)
+                                + "\n"
+                            ).splitlines(True),
                             (normalize(actual, masks) + "\n").splitlines(True),
                             "expected",
                             "actual",
@@ -235,45 +274,47 @@ def main():
     parser.add_argument("dirs", nargs="+", type=Path)
     parser.add_argument("--update", action="store_true")
     args = parser.parse_args()
+    changes = output_changes() if args.command == "run" else []
+    if args.update and changes:
+        sys.exit("--update records outputs on the first version in kubernetes-versions.json")
 
     failed = False
-    for path in args.dirs:
-        lab = load(path)
-        readme = path / "README.md"
-
-        if args.command == "render":
-            readme.write_text(render(lab))
-            print(f"wrote {readme}")
-
-        elif args.command == "check":
-            want = render(lab)
-            have = readme.read_text() if readme.exists() else ""
+    if args.command in ("render", "check"):
+        targets = [(path / "README.md", render(load(path)), "lab.yaml") for path in args.dirs]
+        targets.append((DOCS, with_changes_table(DOCS.read_text()), VERSIONS.name))
+        for target, want, source in targets:
+            if args.command == "render":
+                target.write_text(want)
+                print(f"wrote {target}")
+                continue
+            have = target.read_text() if target.exists() else ""
             if want == have:
-                print(f"ok   {readme}")
+                print(f"ok   {target}")
             else:
                 failed = True
-                print(f"diff {readme}")
+                print(f"diff {target}")
                 sys.stdout.writelines(
                     difflib.unified_diff(
-                        have.splitlines(True), want.splitlines(True), "README.md", "lab.yaml"
+                        have.splitlines(True), want.splitlines(True), target.name, source
                     )
                 )
 
-        elif args.command == "run":
-            print(f"=== {path} ===")
-            for entry in run_lab(path, lab, args.update):
-                if entry["status"] in ("FAIL", "DRIFT"):
-                    failed = True
-                print(f"{entry['status']:5} ({entry['code']}) {entry['run']}")
-                if entry["status"] == "SKIP":
-                    print(f"{INDENT}{entry['actual']}")
-                elif entry["status"] == "FAIL":
-                    print(indent_block(entry["actual"], INDENT))
-                elif entry["status"] == "DRIFT":
-                    print(indent_block(entry["diff"], INDENT))
-            if args.update:
-                yaml_io().dump(lab, lab_path(path))
-                print(f"updated {lab_path(path)}")
+    for path in args.dirs if args.command == "run" else []:
+        lab = load(path)
+        print(f"=== {path} ===")
+        for entry in run_lab(path, lab, args.update, changes):
+            if entry["status"] in ("FAIL", "DRIFT"):
+                failed = True
+            print(f"{entry['status']:5} ({entry['code']}) {entry['run']}")
+            if entry["status"] == "SKIP":
+                print(f"{INDENT}{entry['actual']}")
+            elif entry["status"] == "FAIL":
+                print(indent_block(entry["actual"], INDENT))
+            elif entry["status"] == "DRIFT":
+                print(indent_block(entry["diff"], INDENT))
+        if args.update:
+            yaml_io().dump(lab, lab_path(path))
+            print(f"updated {lab_path(path)}")
 
     sys.exit(1 if failed else 0)
 

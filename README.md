@@ -1,5 +1,11 @@
 # Kubernetes Basics
 
+Tested Kubernetes versions:
+
+- v1.36.1
+- v1.35.5
+- v1.34.8
+
 1. Introduction
 1. Kubernetes Overview
 1. [Kubernetes Environment Setup](03-environment-setup)
