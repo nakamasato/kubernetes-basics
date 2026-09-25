@@ -1,0 +1,30 @@
+name: e2e
+on:
+  pull_request:
+
+jobs:
+  e2e:
+    # 記録済みの出力は Docker Desktop (arm64) の kind クラスタで取ったもの。
+    # ノード名・ラベル・バージョンを揃えないと DRIFT になる
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+      - uses: helm/kind-action@v1
+        with:
+          version: v0.29.0
+          node_image: kindest/node:v1.33.1
+          cluster_name: desktop
+          kubectl_version: v1.34.12
+      - run: kubectl config rename-context kind-desktop docker-desktop
+      # 教材は macOS の base64 前提。GNU base64 は 76 文字で折り返す
+      - run: |
+          mkdir -p "$RUNNER_TEMP/bin"
+          printf '#!/bin/sh\nexec /usr/bin/base64 -w0 "$@"\n' > "$RUNNER_TEMP/bin/base64"
+          chmod +x "$RUNNER_TEMP/bin/base64"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+      - name: labs
+        run: |
+          mapfile -t dirs < <(find . -path '*/.lab/lab.yaml' -printf '%h\n' | xargs -I{} dirname {} | sort)
+          uv run scripts/labs.py check "${dirs[@]}"
+          uv run scripts/labs.py run "${dirs[@]}"

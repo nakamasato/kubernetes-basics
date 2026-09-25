@@ -219,7 +219,7 @@ blocks:
       details: true
       commands:
         - run: kubectl describe node desktop-control-plane
-          output: |
+          example: |
             Name:               desktop-control-plane
             Roles:              control-plane
             Labels:             beta.kubernetes.io/arch=arm64
