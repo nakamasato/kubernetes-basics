@@ -18,15 +18,10 @@ mask:
   # hostIPs は作られた瞬間の値を持ち続けるので、同じクラスタでも実行ごとに変わる
   - pattern: '\n +- ip: fc00:[0-9a-f:]+'
     as: ''
-  # 以下は kubernetes-versions.json の各バージョンで出力が変わるところ
+  # ノードは今動いているバージョンを表示する。表示内容が変わる差分は
+  # kubernetes-versions.json の output_changes に書く
   - pattern: \bv1\.\d+\.\d+\b
     as: <K8S_VERSION>
-  # kubectl 1.35 から Event の Message に対象コンテナが付く
-  - pattern: 'spec\.containers\{[^}]+\}: '
-    as: ''
-  # 1.36 から Pod の status に resources が出る
-  - pattern: '\n +resources: \{\}'
-    as: ''
 
 setup:
   # EndpointSlice はエンドポイントを足された順に並べる。まとめて apply すると

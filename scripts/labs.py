@@ -13,6 +13,7 @@
 
 import argparse
 import difflib
+import json
 import os
 import re
 import subprocess
@@ -151,7 +152,30 @@ def code_ok(expect, code):
     return code == 0
 
 
-def run_lab(path, lab, update):
+VERSIONS = Path(__file__).resolve().parent.parent / "kubernetes-versions.json"
+
+
+def output_changes():
+    """output は kubernetes-versions.json の先頭のバージョンで記録する。いまのサーバーが
+    それより古ければ、そのあとに入った変更を戻した出力がこのバージョンでの正解になる"""
+    proc = subprocess.run(
+        ["kubectl", "version", "-o", "json"], capture_output=True, text=True, check=True
+    )
+    minor = int(json.loads(proc.stdout)["serverVersion"]["minor"].rstrip("+"))
+    return [
+        (re.compile(c["new"]), c["old"])
+        for c in json.loads(VERSIONS.read_text())["output_changes"]
+        if minor < int(c["since"].split(".")[1])
+    ]
+
+
+def for_this_version(output, changes):
+    for pattern, old in changes:
+        output = pattern.sub(old, output)
+    return output
+
+
+def run_lab(path, lab, update, changes):
     findings = []
     # 受講者が手で設定するシェル変数。コマンドごとにプロセスが分かれるので
     # export で引き継ぐ
@@ -184,13 +208,16 @@ def run_lab(path, lab, update):
                 entry = {"run": command["run"], "code": code, "actual": actual}
                 if not code_ok(expect, code):
                     entry["status"] = "FAIL"
-                elif command.get("output") and normalize(command["output"], masks) != normalize(
-                    actual, masks
-                ):
+                elif command.get("output") and normalize(
+                    for_this_version(command["output"], changes), masks
+                ) != normalize(actual, masks):
                     entry["status"] = "DRIFT"
                     entry["diff"] = "".join(
                         difflib.unified_diff(
-                            (normalize(command["output"], masks) + "\n").splitlines(True),
+                            (
+                                normalize(for_this_version(command["output"], changes), masks)
+                                + "\n"
+                            ).splitlines(True),
                             (normalize(actual, masks) + "\n").splitlines(True),
                             "expected",
                             "actual",
@@ -235,6 +262,9 @@ def main():
     parser.add_argument("dirs", nargs="+", type=Path)
     parser.add_argument("--update", action="store_true")
     args = parser.parse_args()
+    changes = output_changes() if args.command == "run" else []
+    if args.update and changes:
+        sys.exit("--update records outputs on the first version in kubernetes-versions.json")
 
     failed = False
     for path in args.dirs:
@@ -261,7 +291,7 @@ def main():
 
         elif args.command == "run":
             print(f"=== {path} ===")
-            for entry in run_lab(path, lab, args.update):
+            for entry in run_lab(path, lab, args.update, changes):
                 if entry["status"] in ("FAIL", "DRIFT"):
                     failed = True
                 print(f"{entry['status']:5} ({entry['code']}) {entry['run']}")
