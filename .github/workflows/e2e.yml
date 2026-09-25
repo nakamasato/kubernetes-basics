@@ -1,9 +1,9 @@
-name: labs
+name: e2e
 on:
   pull_request:
 
 jobs:
-  labs:
+  e2e:
     # 記録済みの出力は Docker Desktop (arm64) の kind クラスタで取ったもの。
     # ノード名・ラベル・バージョンを揃えないと DRIFT になる
     runs-on: ubuntu-24.04-arm
