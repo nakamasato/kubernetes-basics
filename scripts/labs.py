@@ -169,6 +169,18 @@ def output_changes():
     ]
 
 
+DOCS = VERSIONS.parent / "docs" / "labs.md"
+TABLE = re.compile(r"(<!-- output_changes -->\n).*?(?=<!-- /output_changes -->)", re.S)
+
+
+def with_changes_table(text):
+    rows = ["| Since | Change |", "| --- | --- |"] + [
+        f"| {c['since']} | {c['change']} |"
+        for c in json.loads(VERSIONS.read_text())["output_changes"]
+    ]
+    return TABLE.sub(lambda m: m.group(1) + "\n".join(rows) + "\n", text)
+
+
 def for_this_version(output, changes):
     for pattern, old in changes:
         output = pattern.sub(old, output)
@@ -267,43 +279,42 @@ def main():
         sys.exit("--update records outputs on the first version in kubernetes-versions.json")
 
     failed = False
-    for path in args.dirs:
-        lab = load(path)
-        readme = path / "README.md"
-
-        if args.command == "render":
-            readme.write_text(render(lab))
-            print(f"wrote {readme}")
-
-        elif args.command == "check":
-            want = render(lab)
-            have = readme.read_text() if readme.exists() else ""
+    if args.command in ("render", "check"):
+        targets = [(path / "README.md", render(load(path)), "lab.yaml") for path in args.dirs]
+        targets.append((DOCS, with_changes_table(DOCS.read_text()), VERSIONS.name))
+        for target, want, source in targets:
+            if args.command == "render":
+                target.write_text(want)
+                print(f"wrote {target}")
+                continue
+            have = target.read_text() if target.exists() else ""
             if want == have:
-                print(f"ok   {readme}")
+                print(f"ok   {target}")
             else:
                 failed = True
-                print(f"diff {readme}")
+                print(f"diff {target}")
                 sys.stdout.writelines(
                     difflib.unified_diff(
-                        have.splitlines(True), want.splitlines(True), "README.md", "lab.yaml"
+                        have.splitlines(True), want.splitlines(True), target.name, source
                     )
                 )
 
-        elif args.command == "run":
-            print(f"=== {path} ===")
-            for entry in run_lab(path, lab, args.update, changes):
-                if entry["status"] in ("FAIL", "DRIFT"):
-                    failed = True
-                print(f"{entry['status']:5} ({entry['code']}) {entry['run']}")
-                if entry["status"] == "SKIP":
-                    print(f"{INDENT}{entry['actual']}")
-                elif entry["status"] == "FAIL":
-                    print(indent_block(entry["actual"], INDENT))
-                elif entry["status"] == "DRIFT":
-                    print(indent_block(entry["diff"], INDENT))
-            if args.update:
-                yaml_io().dump(lab, lab_path(path))
-                print(f"updated {lab_path(path)}")
+    for path in args.dirs if args.command == "run" else []:
+        lab = load(path)
+        print(f"=== {path} ===")
+        for entry in run_lab(path, lab, args.update, changes):
+            if entry["status"] in ("FAIL", "DRIFT"):
+                failed = True
+            print(f"{entry['status']:5} ({entry['code']}) {entry['run']}")
+            if entry["status"] == "SKIP":
+                print(f"{INDENT}{entry['actual']}")
+            elif entry["status"] == "FAIL":
+                print(indent_block(entry["actual"], INDENT))
+            elif entry["status"] == "DRIFT":
+                print(indent_block(entry["diff"], INDENT))
+        if args.update:
+            yaml_io().dump(lab, lab_path(path))
+            print(f"updated {lab_path(path)}")
 
     sys.exit(1 if failed else 0)
 

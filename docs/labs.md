@@ -55,12 +55,15 @@ shows goes in `output_changes`.
 `kubernetes`. Every `output` is recorded on the first one; `--update` refuses to run against an
 older server.
 
-`output_changes` is the table of how the output of the older tested versions differs:
+`output_changes` is the table of how the output of the older tested versions differs.
+`labs.py render` writes it here and `labs.py check` fails when it is out of date:
 
-| `since` | `change` |
+<!-- output_changes -->
+| Since | Change |
 | --- | --- |
 | v1.35 | kubectl describe prefixes an event message with the container it is about |
 | v1.36 | A Pod's status reports resources |
+<!-- /output_changes -->
 
 Each entry has `new`, a regex for the text as it looks from `since` on, and `old`, the text before
 `since` (empty when it did not exist; `\1` refers back to a group in `new`). A field that was added
