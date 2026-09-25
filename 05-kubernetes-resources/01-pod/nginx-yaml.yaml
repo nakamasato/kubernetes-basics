@@ -4,12 +4,12 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"name":"nginx-yaml","namespace":"default"},"spec":{"containers":[{"image":"nginx","name":"nginx"}]}}
-  creationTimestamp: "2026-08-14T15:39:30Z"
+  creationTimestamp: "2026-09-25T07:15:54Z"
   generation: 1
   name: nginx-yaml
   namespace: default
-  resourceVersion: "10496"
-  uid: 10840d69-100f-4c6a-9f76-8076bc55023a
+  resourceVersion: "553"
+  uid: af1f614b-32b4-416d-b1ad-3f4606cebc70
 spec:
   containers:
   - image: nginx
@@ -20,7 +20,7 @@ spec:
     terminationMessagePolicy: File
     volumeMounts:
     - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-      name: kube-api-access-89r5s
+      name: kube-api-access-mbr9q
       readOnly: true
   dnsPolicy: ClusterFirst
   enableServiceLinks: true
@@ -43,7 +43,7 @@ spec:
     operator: Exists
     tolerationSeconds: 300
   volumes:
-  - name: kube-api-access-89r5s
+  - name: kube-api-access-mbr9q
     projected:
       defaultMode: 420
       sources:
@@ -64,29 +64,34 @@ spec:
 status:
   conditions:
   - lastProbeTime: null
-    lastTransitionTime: "2026-08-14T15:39:34Z"
+    lastTransitionTime: "2026-09-25T07:15:54Z"
+    observedGeneration: 1
     status: "True"
     type: PodReadyToStartContainers
   - lastProbeTime: null
-    lastTransitionTime: "2026-08-14T15:39:30Z"
+    lastTransitionTime: "2026-09-25T07:15:54Z"
+    observedGeneration: 1
     status: "True"
     type: Initialized
   - lastProbeTime: null
-    lastTransitionTime: "2026-08-14T15:39:34Z"
+    lastTransitionTime: "2026-09-25T07:15:55Z"
+    observedGeneration: 1
     status: "True"
     type: Ready
   - lastProbeTime: null
-    lastTransitionTime: "2026-08-14T15:39:34Z"
+    lastTransitionTime: "2026-09-25T07:15:55Z"
+    observedGeneration: 1
     status: "True"
     type: ContainersReady
   - lastProbeTime: null
-    lastTransitionTime: "2026-08-14T15:39:30Z"
+    lastTransitionTime: "2026-09-25T07:15:54Z"
+    observedGeneration: 1
     status: "True"
     type: PodScheduled
   containerStatuses:
-  - containerID: containerd://89a2af52c66df5e815b94c0371170ea6ada001d8fbe4935f1d9d2434b23031a5
+  - containerID: containerd://35f5a269b046ece9b3c98807c0e1545e6436fdd1898749eba84932998f9f10a7
     image: docker.io/library/nginx:latest
-    imageID: docker.io/library/nginx@sha256:8541484afbc9c8a5a8a99b379568ebbc957f658583ec9448fc43104229c03cf8
+    imageID: docker.io/library/nginx@sha256:abe47724e466aeab9a345d8e46a221c2fa8953c7848bb4a3bd9976a7199f8cf2
     lastState: {}
     name: nginx
     ready: true
@@ -95,7 +100,7 @@ status:
     started: true
     state:
       running:
-        startedAt: "2026-08-14T15:39:34Z"
+        startedAt: "2026-09-25T07:15:55Z"
     user:
       linux:
         gid: 0
@@ -104,15 +109,17 @@ status:
         uid: 0
     volumeMounts:
     - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-      name: kube-api-access-89r5s
+      name: kube-api-access-mbr9q
       readOnly: true
       recursiveReadOnly: Disabled
-  hostIP: 172.18.0.3
+  hostIP: 172.18.0.2
   hostIPs:
-  - ip: 172.18.0.3
+  - ip: 172.18.0.2
+  observedGeneration: 1
   phase: Running
-  podIP: 10.244.0.134
+  podIP: 10.244.0.6
   podIPs:
-  - ip: 10.244.0.134
+  - ip: 10.244.0.6
   qosClass: BestEffort
-  startTime: "2026-08-14T15:39:30Z"
+  resources: {}
+  startTime: "2026-09-25T07:15:54Z"
