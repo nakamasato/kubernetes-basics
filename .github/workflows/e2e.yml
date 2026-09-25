@@ -15,7 +15,14 @@ jobs:
           version: v0.29.0
           node_image: kindest/node:v1.33.1
           cluster_name: desktop
+          kubectl_version: v1.34.12
       - run: kubectl config rename-context kind-desktop docker-desktop
+      # 教材は macOS の base64 前提。GNU base64 は 76 文字で折り返す
+      - run: |
+          mkdir -p "$RUNNER_TEMP/bin"
+          printf '#!/bin/sh\nexec /usr/bin/base64 -w0 "$@"\n' > "$RUNNER_TEMP/bin/base64"
+          chmod +x "$RUNNER_TEMP/bin/base64"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
       - name: labs
         run: |
           mapfile -t dirs < <(find . -path '*/.lab/lab.yaml' -printf '%h\n' | xargs -I{} dirname {} | sort)
