@@ -194,9 +194,9 @@ blocks:
   - exec:
       level: 2
       marker: '- [ ]'
-      desc: Create Deployemnt yaml with container image to `ghcr.io/nakamasato/fastapi-sample:v1.0`.
+      desc: Create Deployemnt yaml with container image to `ghcr.io/nakamasato/fastapi-sample:v1.1`.
       commands:
-        - run: kubectl create deploy sample-app --image=ghcr.io/nakamasato/fastapi-sample:v1.0 --dry-run=client -o yaml > sample-app-deployment.yaml
+        - run: kubectl create deploy sample-app --image=ghcr.io/nakamasato/fastapi-sample:v1.1 --dry-run=client -o yaml > sample-app-deployment.yaml
           skip: 実行すると envFrom を足した完成版の sample-app-deployment.yaml を上書きする
 
   - exec:
