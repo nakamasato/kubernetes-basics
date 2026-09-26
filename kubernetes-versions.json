@@ -1,0 +1,18 @@
+{
+  "kind": "v0.32.0",
+  "kubernetes": ["v1.36.1", "v1.35.5", "v1.34.8"],
+  "output_changes": [
+    {
+      "since": "v1.35",
+      "change": "kubectl describe prefixes an event message with the container it is about",
+      "new": "spec\\.containers\\{[^}]+\\}: ",
+      "old": ""
+    },
+    {
+      "since": "v1.36",
+      "change": "A Pod's status reports resources",
+      "new": "\\n  resources: \\{\\}(?=\\n)",
+      "old": ""
+    }
+  ]
+}

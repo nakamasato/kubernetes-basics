@@ -18,13 +18,8 @@ spec:
         app: mysql
     spec:
       containers:
-      - image: mysql:8.3
+      - image: mysql:8.4
         name: mysql
-        args:
-         - --default-authentication-plugin=mysql_native_password
-        # caching_sha2_password is used for the default auth from mysql:8
-        # which requires more dependencies in client side.
-        # https://hub.docker.com/_/mysql
         env:
           - name: MYSQL_ROOT_PASSWORD
             value: password

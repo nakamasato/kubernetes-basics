@@ -1,0 +1,74 @@
+teardown:
+  - kubectl delete -f pod-my-app.yaml -f pod-your-app.yaml -f service-my-app.yaml --ignore-not-found
+
+blocks:
+  - md: |
+      # Service
+
+  - exec:
+      desc: Apply pods
+      commands:
+        - run: kubectl apply -f pod-my-app.yaml
+        - run: kubectl apply -f pod-your-app.yaml
+
+  - exec:
+      desc: Show labels
+      commands:
+        - run: kubectl get po --show-labels
+
+  - exec:
+      desc: Filter pods by label
+      commands:
+        - run: kubectl get po --selector app=MyApp
+        - run: kubectl get po --selector app=YourApp
+
+  - exec:
+      desc: Create service.
+      commands:
+        - run: kubectl apply -f service-my-app.yaml
+
+  - exec:
+      commands:
+        - run: kubectl get service
+
+  - exec:
+      note: |
+        Check EndpointSlices
+      commands:
+        - run: kubectl get endpointslice
+          before:
+            - kubectl wait --for=condition=Ready pod/my-app --timeout=120s
+
+  - exec:
+      note: |
+        You can see IP address with port `80`.
+
+        This IP is the IP address of pod `my-app`
+      commands:
+        - run: kubectl get pod --selector app=MyApp -o wide
+
+  - exec:
+      desc: Access to the service
+      note: |
+        port-forward:
+      commands:
+        - run: kubectl port-forward svc/my-app 8080:80
+          skip: 手動で止めるまで終わらないので自動実行できない
+
+  - exec:
+      note: |
+        logs
+      commands:
+        - run: kubectl logs my-app -f
+          skip: -f が終了しないので自動実行できない
+
+  - exec:
+      note: |
+        Open [localhost:8080]() on your browser.
+
+        -> You can see the nginx page.
+
+  - exec:
+      desc: Delete resources.
+      commands:
+        - run: kubectl delete -f .

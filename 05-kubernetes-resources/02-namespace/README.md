@@ -1,6 +1,5 @@
 # Namespace
 
-
 1. Create and delete namespace with yaml file.
 
     Create:

@@ -1,6 +1,5 @@
 # Service
 
-
 1. Apply pods
 
     ```
@@ -23,19 +22,18 @@
 
 1. Create service.
 
-
     ```
-    kubectl apply -f service-my-service.yaml
+    kubectl apply -f service-my-app.yaml
     ```
 
     ```
     kubectl get service
     ```
 
-    Check Endpoints
+    Check EndpointSlices
 
     ```
-    kubectl get endpoints
+    kubectl get endpointslice
     ```
 
     You can see IP address with port `80`.

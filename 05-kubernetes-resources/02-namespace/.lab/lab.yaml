@@ -1,0 +1,112 @@
+teardown:
+  - kubectl delete ns test test-with-kubectl-create team-a team-b --ignore-not-found
+
+blocks:
+  - md: |
+      # Namespace
+
+  - exec:
+      desc: Create and delete namespace with yaml file.
+      note: |
+        Create:
+      commands:
+        - run: kubectl apply -f namespace-test.yaml
+
+  - exec:
+      note: |
+        Check:
+      commands:
+        - run: kubectl get namespace
+
+  - exec:
+      note: |
+        Delete:
+      commands:
+        - run: kubectl delete -f namespace-test.yaml
+
+  - exec:
+      desc: Create and delete namespace with only command.
+      commands:
+        - run: kubectl create namespace test-with-kubectl-create
+
+  - exec:
+      commands:
+        - run: kubectl delete ns test-with-kubectl-create
+
+  - exec:
+      desc: Create yaml file for namespace `team-a` and `team-b`.
+      note: |
+        1. `team-a`: Create manually by filling `apiVersion`, `kind`, and `metadata`.
+
+        1. `team-b`: Create with `kubectl create` command
+      commands:
+        - run: kubectl create ns team-b --dry-run=client -o yaml > ns-team-b.yaml
+
+  - exec:
+      desc: Create namespaces
+      commands:
+        - run: kubectl apply -f ns-team-a.yaml,ns-team-b.yaml
+
+  - exec:
+      desc: Check namespaces
+      commands:
+        - run: kubectl get ns
+
+  - exec:
+      desc: Create pod in `team-a`
+      commands:
+        - run: kubectl run nginx --image=nginx -n team-a
+
+  - exec:
+      note: |
+        check:
+      commands:
+        - run: kubectl get pod
+
+  - exec:
+      commands:
+        - run: kubectl get pod -n team-a
+
+  - exec:
+      desc: Create pod with the same name in `team-a`
+      commands:
+        - run: kubectl run nginx --image=nginx -n team-a
+          expect: failure
+
+  - exec:
+      note: |
+        -> Will fail with an error: `Error from server (AlreadyExists): pods "nginx" already exists`
+
+  - exec:
+      desc: Create pod with the same name in `team-b`
+      commands:
+        - run: kubectl run nginx --image=nginx -n team-b
+
+  - exec:
+      desc: Check pods in all namespaces
+      commands:
+        - run: kubectl get pod --all-namespaces
+
+  - exec:
+      desc: Delete namespace `team-a`
+      commands:
+        - run: kubectl delete ns team-a
+
+  - exec:
+      note: |
+        -> the pod in namespace `team-a` is also deleted.
+      commands:
+        - run: kubectl get pod --all-namespaces
+
+  - exec:
+      desc: Delete namespace `team-b`
+      commands:
+        - run: kubectl delete ns team-b
+
+  - exec:
+      commands:
+        - run: kubectl get pod --all-namespaces
+
+  - exec:
+      note: |
+        Everything is deleted.

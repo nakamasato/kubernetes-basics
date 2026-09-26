@@ -1,0 +1,74 @@
+teardown:
+  - kubectl delete -f replicaset.yaml --ignore-not-found
+
+blocks:
+  - md: |
+      # ReplicaSet
+
+  - exec:
+      desc: Apply replicaset
+      commands:
+        - run: kubectl apply -f replicaset.yaml
+
+  - exec:
+      desc: Check replicaset and pod
+      commands:
+        - run: kubectl get replicaset
+
+  - exec:
+      commands:
+        - run: kubectl get pod
+
+  - exec:
+      desc: Scale replicaset to replica=3
+      commands:
+        - run: kubectl scale rs/nginx --replicas=3
+
+  - exec:
+      note: |
+        `rs`: `replicaset`
+      commands:
+        - run: kubectl get pods
+
+  - exec:
+      note: |
+        -> 3 pods
+
+  - exec:
+      desc: 'Apply yaml file (replica: 2) again'
+      commands:
+        - run: kubectl apply -f replicaset.yaml
+
+  - exec:
+      note: |
+        check pods:
+      commands:
+        - run: kubectl get pods
+
+  - exec:
+      note: |
+        -> 2 pods
+
+  - exec:
+      desc: Confirm replicaset keeps the required number of pods running all the time.
+      note: |
+        Keep watching the number of pods
+      commands:
+        - run: watch kubectl get pod
+          skip: 終了しないので自動実行できない
+
+  - exec:
+      note: |
+        Delete a pod
+      commands:
+        - run: kubectl delete po <pod name>
+          skip: Pod 名が受講者の環境ごとに変わるプレースホルダ
+
+  - exec:
+      note: |
+        ReplicaSet automatically add a new pod
+
+  - exec:
+      desc: Delete all the resources
+      commands:
+        - run: kubectl delete -f replicaset.yaml

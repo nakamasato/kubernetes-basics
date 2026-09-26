@@ -7,6 +7,7 @@
     ```
 
 1. Create pod with `kubectl run`
+
     ```
     kubectl run nginx --image=nginx
     ```
@@ -18,72 +19,45 @@
     ```
 
 1. Check the pod created by `kubectl run`
+
     ```
     kubectl get pod nginx -o yaml > nginx-kubectl-run.yaml
     ```
+
 1. Compare them.
 
-    - Mostly different in `CreationTimestamp` and hash values.
-    - `labels` appears in `kubectl-run`
+    - `kubectl apply` adds the `kubectl.kubernetes.io/last-applied-configuration` annotation.
+    - `labels` appears in `kubectl run`.
+    - The rest differs only in timestamps, hash values, resource versions and IPs.
 
     ```diff
     diff nginx-yaml.yaml nginx-kubectl-run.yaml
-    4,5c4,7
-    <   creationTimestamp: "2021-08-10T23:10:55Z"
+    4,6d3
+    <   annotations:
+    <     kubectl.kubernetes.io/last-applied-configuration: |
+    <       {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"name":"nginx-yaml","namespace":"default"},"spec":{"containers":[{"image":"nginx","name":"nginx"}]}}
+    9c6,8
     <   name: nginx-yaml
     ---
-    >   creationTimestamp: "2021-08-10T23:12:34Z"
     >   labels:
     >     run: nginx
     >   name: nginx
-    7,8c9,10
-    <   resourceVersion: "74084"
-    <   uid: 3bc02c8e-fe9a-4d5b-b816-8e58377e5e2b
+    11,12c10,11
+    <   resourceVersion: "1866"
+    <   uid: 4c679147-42e5-4b18-b1e0-a5d12bf98dc4
     ---
-    >   resourceVersion: "74214"
-    >   uid: a492f636-535a-4117-80a0-9abc4af15345
-    19c21
-    <       name: kube-api-access-p8rlz
+    >   resourceVersion: "1873"
+    >   uid: 548a3586-5517-42cd-a8ba-915735bd9b23
+    23c22
+    <       name: kube-api-access-zv854
     ---
-    >       name: kube-api-access-6vfnl
-    42c44
-    <   - name: kube-api-access-p8rlz
+    >       name: kube-api-access-6ttw7
+    87c86
+    <   - containerID: containerd://dc86531e10d411010e95f9d0ef830abca03829d6fb621e9f4a351f8fdecacf66
     ---
-    >   - name: kube-api-access-6vfnl
-    63c65
-    <     lastTransitionTime: "2021-08-10T23:10:55Z"
+    >   - containerID: containerd://bfa8cb0fa7041046ffdcb9e22a9a0f6712843978182b1fb1dbb2f28b1f72f676
+    114c113
+    <   podIP: 10.244.0.7
     ---
-    >     lastTransitionTime: "2021-08-10T23:12:34Z"
-    67c69
-    <     lastTransitionTime: "2021-08-10T23:10:59Z"
-    ---
-    >     lastTransitionTime: "2021-08-10T23:12:38Z"
-    71c73
-    <     lastTransitionTime: "2021-08-10T23:10:59Z"
-    ---
-    >     lastTransitionTime: "2021-08-10T23:12:38Z"
-    75c77
-    <     lastTransitionTime: "2021-08-10T23:10:55Z"
-    ---
-    >     lastTransitionTime: "2021-08-10T23:12:34Z"
-    79c81
-    <   - containerID: docker://7dc65e0a60261002faa0847c565bb9d8d515aebc77ff31b7b8d1e5714757992c
-    ---
-    >   - containerID: docker://b49d81708345a54f1218fdba81070cbdab16619299de1160eaec6968af884ffb
-    89c91
-    <         startedAt: "2021-08-10T23:10:59Z"
-    ---
-    >         startedAt: "2021-08-10T23:12:37Z"
-    92c94
-    <   podIP: 10.1.0.6
-    ---
-    >   podIP: 10.1.0.7
-    94c96
-    <   - ip: 10.1.0.6
-    ---
-    >   - ip: 10.1.0.7
-    96c98
-    <   startTime: "2021-08-10T23:10:55Z"
-    ---
-    >   startTime: "2021-08-10T23:12:34Z"
+    >   podIP: 10.244.0.8
     ```
