@@ -1,1 +1,3 @@
 .DS_Store
+e2e-artifacts/
+__pycache__/

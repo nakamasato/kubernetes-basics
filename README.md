@@ -1,5 +1,7 @@
 # Kubernetes Basics
 
+Version changes can be checked locally and in CI with [kind E2E tests](e2e/README.md).
+
 1. Introduction
 1. Kubernetes Overview
 1. [Kubernetes Environment Setup](03-environment-setup)
