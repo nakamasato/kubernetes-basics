@@ -523,6 +523,21 @@ kubectl get node -o jsonpath='{.items[*].metadata.name}'
 
     You can see `reason: ImagePullBackOff` and `message: Back-off pulling image "wrong-nginx"`
 
+1. Fix the image of `nginx-1` and check that it becomes `Running`.
+
+    Editing `image` in `pod-nginx-1-with-wrong-nginx-image.yaml` and running `kubectl apply -f pod-nginx-1-with-wrong-nginx-image.yaml` works as well.
+
+    ```
+    kubectl set image pod/nginx-1 nginx=nginx
+    pod/nginx-1 image updated
+    ```
+
+    ```
+    kubectl get pod nginx-1
+    NAME      READY   STATUS    RESTARTS   AGE
+    nginx-1   1/1     Running   0          34s
+    ```
+
 #### 2. Why isn't `nginx-2` running?
 
 1. Describe the Pod.
@@ -624,7 +639,14 @@ kubectl get node -o jsonpath='{.items[*].metadata.name}'
 kubectl port-forward svc/nginx-1 8080:80
 ```
 
-Open http://localhost:8080 on your browser or hit the localhost:8080 by a command e.g. `curl`
+1. Open http://localhost:8080 on your browser or send a request from another terminal.
+
+    ```
+    curl -sS localhost:8080 | grep title
+    <title>Welcome to nginx!</title>
+    ```
+
+Stop the port-forward with `Ctrl-C`.
 
 ##### 2. Check `EndpointSlice` resource.
 
@@ -669,7 +691,7 @@ Open http://localhost:8080 on your browser or hit the localhost:8080 by a comman
         Zone:       <unset>
       - Addresses:  10.244.0.72
         Conditions:
-          Ready:    false
+          Ready:    true
         Hostname:   <unset>
         TargetRef:  Pod/nginx-1
         NodeName:   desktop-control-plane
@@ -682,6 +704,100 @@ Open http://localhost:8080 on your browser or hit the localhost:8080 by a comman
     - `Conditions.Ready: true`: the Pod behind that address is ready to receive traffic.
     - `Conditions.Ready: false`: the Pod is registered but not ready.
     - `TargetRef` tells you which Pod each address belongs to.
+
+1. Check the Pods that match the Service's `selector`.
+
+    <details>
+
+    ```
+    kubectl get po -l run=nginx
+    NAME      READY   STATUS    RESTARTS   AGE
+    nginx-1   1/1     Running   0          34s
+    nginx-2   0/1     Pending   0          34s
+    nginx-3   1/1     Running   0          70s
+    ```
+
+    </details>
+
+1. Check the Service's `Port` and `TargetPort`.
+
+    <details>
+
+    ```
+    kubectl describe svc nginx-1
+    Name:                     nginx-1
+    Namespace:                default
+    Labels:                   run=nginx
+    Annotations:              <none>
+    Selector:                 run=nginx
+    Type:                     ClusterIP
+    IP Family Policy:         SingleStack
+    IP Families:              IPv4
+    IP:                       10.96.234.135
+    IPs:                      10.96.234.135
+    Port:                     80  80/TCP
+    TargetPort:               80/TCP
+    Endpoints:                10.244.0.5:80,10.244.0.6:80
+    Session Affinity:         None
+    Internal Traffic Policy:  Cluster
+    Events:                   <none>
+    ```
+
+    </details>
+
+##### 3. Break `nginx-1` and see `Ready` change.
+
+1. Set a wrong image to `nginx-1`.
+
+    Editing `image` in the YAML and running `kubectl apply` works as well.
+
+    ```
+    kubectl set image pod/nginx-1 nginx=wrong-nginx
+    pod/nginx-1 image updated
+    ```
+
+    ```
+    kubectl get pod nginx-1
+    NAME      READY   STATUS             RESTARTS   AGE
+    nginx-1   0/1     ImagePullBackOff   0          37s
+    ```
+
+1. Describe `EndpointSlice` again. `nginx-1` is now `Ready: false`.
+
+    <details>
+
+    ```
+    kubectl describe endpointslice -l kubernetes.io/service-name=nginx-1
+    Name:         nginx-1-mj77l
+    Namespace:    default
+    Labels:       endpointslice.kubernetes.io/managed-by=endpointslice-controller.k8s.io
+                  kubernetes.io/service-name=nginx-1
+                  run=nginx
+    Annotations:  endpoints.kubernetes.io/last-change-trigger-time: 2026-09-22T06:31:50Z
+    AddressType:  IPv4
+    Ports:
+      Name  Port  Protocol
+      ----  ----  --------
+      80    80    TCP
+    Endpoints:
+      - Addresses:  10.244.0.5
+        Conditions:
+          Ready:    true
+        Hostname:   <unset>
+        TargetRef:  Pod/nginx-3
+        NodeName:   desktop-control-plane
+        Zone:       <unset>
+      - Addresses:  10.244.0.6
+        Conditions:
+          Ready:    false
+        Hostname:   <unset>
+        TargetRef:  Pod/nginx-1
+        NodeName:   desktop-control-plane
+        Zone:       <unset>
+    Events:         <none>
+    ```
+
+    </details>
 
 1. Check Pod Ips.
 
@@ -717,54 +833,47 @@ Open http://localhost:8080 on your browser or hit the localhost:8080 by a comman
 
     There's no `Endpoints` -> Should be no matching Pods.
 
+1. Port-forward `nginx-2` and send a request from another terminal.
+
+    ```
+    kubectl port-forward svc/nginx-2 8080:80
+    curl -sS localhost:8080 | grep title
+    ```
+
+    ```
+    curl -sS localhost:8080 | grep title
+    curl: (7) Failed to connect to localhost port 8080 after 0 ms: Couldn't connect to server
+    ```
+
+    No Pod receives the request. Stop the port-forward with `Ctrl-C`.
+
 1. Check `Service`'s `selector`
 
     <details>
 
     ```
-    kubectl get svc nginx-2 -o yaml
-    apiVersion: v1
-    kind: Service
-    metadata:
-      annotations:
-        kubectl.kubernetes.io/last-applied-configuration: |
-          {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"creationTimestamp":null,"labels":{"run":"nginx"},"name":"nginx-2","namespace":"default"},"spec":{"ports":[{"name":"80","port":80,"protocol":"TCP","targetPort":80}],"selector":{"run":"nonexisting"},"type":"ClusterIP"},"status":{"loadBalancer":{}}}
-      creationTimestamp: "2026-08-14T15:30:50Z"
-      labels:
-        run: nginx
-      name: nginx-2
-      namespace: default
-      resourceVersion: "8013"
-      uid: f7bf8ca1-3f62-4b71-82b5-74d5628b8504
-    spec:
-      clusterIP: 10.96.202.236
-      clusterIPs:
-      - 10.96.202.236
-      internalTrafficPolicy: Cluster
-      ipFamilies:
-      - IPv4
-      ipFamilyPolicy: SingleStack
-      ports:
-      - name: "80"
-        port: 80
-        protocol: TCP
-        targetPort: 80
-      selector:
-        run: nonexisting
-      sessionAffinity: None
-      type: ClusterIP
-    status:
-      loadBalancer: {}
+    kubectl describe svc nginx-2
+    Name:                     nginx-2
+    Namespace:                default
+    Labels:                   run=nginx
+    Annotations:              <none>
+    Selector:                 run=nonexisting
+    Type:                     ClusterIP
+    IP Family Policy:         SingleStack
+    IP Families:              IPv4
+    IP:                       10.96.212.194
+    IPs:                      10.96.212.194
+    Port:                     80  80/TCP
+    TargetPort:               80/TCP
+    Endpoints:
+    Session Affinity:         None
+    Internal Traffic Policy:  Cluster
+    Events:                   <none>
     ```
 
     </details>
 
-    ```yaml
-      selector:
-        run: nonexisting
-    ```
-
-    There's no Pod with such a label.
+    `Selector: run=nonexisting` -> There's no Pod with such a label.
 
     ```
     kubectl get po --show-labels
@@ -772,6 +881,28 @@ Open http://localhost:8080 on your browser or hit the localhost:8080 by a comman
     nginx-1   0/1     ErrImagePull   0          7s    run=nginx
     nginx-2   0/1     Pending        0          7s    run=nginx
     nginx-3   1/1     Running        0          7s    run=nginx
+    ```
+
+1. Check that no Pod matches the `selector`.
+
+    ```
+    kubectl get po -l run=nonexisting
+    No resources found in default namespace.
+    ```
+
+1. Fix the `selector` of `nginx-2` and check `EndpointSlice` again.
+
+    Editing `selector` in `service-nginx-2-with-non-existing-selector.yaml` and running `kubectl apply` works as well.
+
+    ```
+    kubectl set selector service nginx-2 run=nginx
+    service/nginx-2 selector updated
+    ```
+
+    ```
+    kubectl get endpointslice -l kubernetes.io/service-name=nginx-2
+    NAME            ADDRESSTYPE   PORTS   ENDPOINTS               AGE
+    nginx-2-5vqkn   IPv4          80      10.244.0.5,10.244.0.6   37s
     ```
 
 **Tips**:

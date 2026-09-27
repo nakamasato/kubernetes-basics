@@ -65,26 +65,26 @@ blocks:
         - run: kubectl get po -A
           output: |
             NAMESPACE            NAME                                            READY   STATUS         RESTARTS   AGE
-            default              nginx-1                                         0/1     ErrImagePull   0          6s
-            default              nginx-2                                         0/1     Pending        0          6s
-            default              nginx-3                                         1/1     Running        0          6s
-            kube-system          coredns-674b8bbfcf-dtms5                        1/1     Running        0          67m
-            kube-system          coredns-674b8bbfcf-mlj6k                        1/1     Running        0          67m
-            kube-system          etcd-desktop-control-plane                      1/1     Running        0          67m
-            kube-system          kindnet-n4fjq                                   1/1     Running        0          67m
-            kube-system          kube-apiserver-desktop-control-plane            1/1     Running        0          67m
-            kube-system          kube-controller-manager-desktop-control-plane   1/1     Running        0          67m
-            kube-system          kube-proxy-zls4t                                1/1     Running        0          67m
-            kube-system          kube-scheduler-desktop-control-plane            1/1     Running        0          67m
-            local-path-storage   local-path-provisioner-7dc846544d-c2gl7         1/1     Running        0          67m
-            test                 nginx-4                                         1/1     Running        0          6s
+            default              nginx-1                                         0/1     ErrImagePull   0          4s
+            default              nginx-2                                         0/1     Pending        0          4s
+            default              nginx-3                                         1/1     Running        0          8s
+            kube-system          coredns-589f44dc88-xwrfr                        1/1     Running        0          63m
+            kube-system          coredns-589f44dc88-zcpr6                        1/1     Running        0          63m
+            kube-system          etcd-desktop-control-plane                      1/1     Running        0          63m
+            kube-system          kindnet-rcwvf                                   1/1     Running        0          63m
+            kube-system          kube-apiserver-desktop-control-plane            1/1     Running        0          63m
+            kube-system          kube-controller-manager-desktop-control-plane   1/1     Running        0          63m
+            kube-system          kube-proxy-qfjg6                                1/1     Running        0          63m
+            kube-system          kube-scheduler-desktop-control-plane            1/1     Running        0          63m
+            local-path-storage   local-path-provisioner-855c7b7774-cb5fh         1/1     Running        0          63m
+            test                 nginx-4                                         1/1     Running        0          4s
         - run: kubectl get pod --selector run=nginx -A
           output: |
             NAMESPACE   NAME      READY   STATUS         RESTARTS   AGE
-            default     nginx-1   0/1     ErrImagePull   0          6s
-            default     nginx-2   0/1     Pending        0          6s
-            default     nginx-3   1/1     Running        0          6s
-            test        nginx-4   1/1     Running        0          6s
+            default     nginx-1   0/1     ErrImagePull   0          4s
+            default     nginx-2   0/1     Pending        0          4s
+            default     nginx-3   1/1     Running        0          8s
+            test        nginx-4   1/1     Running        0          4s
 
 
   - exec:
@@ -93,7 +93,7 @@ blocks:
         - run: kubectl get node
           output: |
             NAME                    STATUS   ROLES           AGE   VERSION
-            desktop-control-plane   Ready    control-plane   67m   v1.33.1
+            desktop-control-plane   Ready    control-plane   63m   v1.36.1
         - run: kubectl get node -l kubernetes.io/arch=amd64
           output: |
             No resources found
@@ -108,11 +108,11 @@ blocks:
         - run: kubectl get node
           output: |
             NAME                    STATUS   ROLES           AGE   VERSION
-            desktop-control-plane   Ready    control-plane   67m   v1.33.1
+            desktop-control-plane   Ready    control-plane   63m   v1.36.1
         - run: kubectl get node -l kubernetes.io/arch=arm64
           output: |
             NAME                    STATUS   ROLES           AGE   VERSION
-            desktop-control-plane   Ready    control-plane   67m   v1.33.1
+            desktop-control-plane   Ready    control-plane   63m   v1.36.1
 
 
   - exec:
@@ -121,13 +121,13 @@ blocks:
         - run: kubectl get po --show-labels
           output: |
             NAME      READY   STATUS         RESTARTS   AGE   LABELS
-            nginx-1   0/1     ErrImagePull   0          6s    run=nginx
-            nginx-2   0/1     Pending        0          6s    run=nginx
-            nginx-3   1/1     Running        0          6s    run=nginx
+            nginx-1   0/1     ErrImagePull   0          4s    run=nginx
+            nginx-2   0/1     Pending        0          4s    run=nginx
+            nginx-3   1/1     Running        0          8s    run=nginx
         - run: kubectl get node --show-labels
           output: |
             NAME                    STATUS   ROLES           AGE   VERSION   LABELS
-            desktop-control-plane   Ready    control-plane   67m   v1.33.1   beta.kubernetes.io/arch=arm64,beta.kubernetes.io/os=linux,kubernetes.io/arch=arm64,kubernetes.io/hostname=desktop-control-plane,kubernetes.io/os=linux,node-role.kubernetes.io/control-plane=
+            desktop-control-plane   Ready    control-plane   63m   v1.36.1   beta.kubernetes.io/arch=arm64,beta.kubernetes.io/os=linux,kubernetes.io/arch=arm64,kubernetes.io/hostname=desktop-control-plane,kubernetes.io/os=linux,node-role.kubernetes.io/control-plane=
 
 
   - md: |
@@ -187,7 +187,7 @@ blocks:
         - run: kubectl get node
           output: |
             NAME                    STATUS   ROLES           AGE   VERSION
-            desktop-control-plane   Ready    control-plane   67m   v1.33.1
+            desktop-control-plane   Ready    control-plane   63m   v1.36.1
 
 
   - exec:
@@ -207,7 +207,7 @@ blocks:
         - run: kubectl get pod nginx-1 -o wide
           output: |
             NAME      READY   STATUS         RESTARTS   AGE   IP            NODE                    NOMINATED NODE   READINESS GATES
-            nginx-1   0/1     ErrImagePull   0          7s    10.244.0.72   desktop-control-plane   <none>           <none>
+            nginx-1   0/1     ErrImagePull   0          5s    10.244.0.27   desktop-control-plane   <none>           <none>
 
 
   - md: |
@@ -228,25 +228,24 @@ blocks:
                                 kubernetes.io/hostname=desktop-control-plane
                                 kubernetes.io/os=linux
                                 node-role.kubernetes.io/control-plane=
-            Annotations:        kubeadm.alpha.kubernetes.io/cri-socket: unix:///run/containerd/containerd.sock
-                                node.alpha.kubernetes.io/ttl: 0
+            Annotations:        node.alpha.kubernetes.io/ttl: 0
                                 volumes.kubernetes.io/controller-managed-attach-detach: true
-            CreationTimestamp:  Fri, 14 Aug 2026 23:23:45 +0900
+            CreationTimestamp:  Wed, 23 Sep 2026 22:51:56 +0900
             Taints:             <none>
             Unschedulable:      false
             Lease:
               HolderIdentity:  desktop-control-plane
               AcquireTime:     <unset>
-              RenewTime:       Sat, 15 Aug 2026 00:30:56 +0900
+              RenewTime:       Wed, 23 Sep 2026 23:55:08 +0900
             Conditions:
               Type             Status  LastHeartbeatTime                 LastTransitionTime                Reason                       Message
               ----             ------  -----------------                 ------------------                ------                       -------
-              MemoryPressure   False   Sat, 15 Aug 2026 00:30:45 +0900   Fri, 14 Aug 2026 23:23:42 +0900   KubeletHasSufficientMemory   kubelet has sufficient memory available
-              DiskPressure     False   Sat, 15 Aug 2026 00:30:45 +0900   Fri, 14 Aug 2026 23:23:42 +0900   KubeletHasNoDiskPressure     kubelet has no disk pressure
-              PIDPressure      False   Sat, 15 Aug 2026 00:30:45 +0900   Fri, 14 Aug 2026 23:23:42 +0900   KubeletHasSufficientPID      kubelet has sufficient PID available
-              Ready            True    Sat, 15 Aug 2026 00:30:45 +0900   Fri, 14 Aug 2026 23:24:04 +0900   KubeletReady                 kubelet is posting ready status
+              MemoryPressure   False   Wed, 23 Sep 2026 23:54:56 +0900   Wed, 23 Sep 2026 22:51:56 +0900   KubeletHasSufficientMemory   kubelet has sufficient memory available
+              DiskPressure     False   Wed, 23 Sep 2026 23:54:56 +0900   Wed, 23 Sep 2026 22:51:56 +0900   KubeletHasNoDiskPressure     kubelet has no disk pressure
+              PIDPressure      False   Wed, 23 Sep 2026 23:54:56 +0900   Wed, 23 Sep 2026 22:51:56 +0900   KubeletHasSufficientPID      kubelet has sufficient PID available
+              Ready            True    Wed, 23 Sep 2026 23:54:56 +0900   Wed, 23 Sep 2026 22:52:19 +0900   KubeletReady                 kubelet is posting ready status
             Addresses:
-              InternalIP:  172.18.0.3
+              InternalIP:  172.18.0.2
               Hostname:    desktop-control-plane
             Capacity:
               cpu:                8
@@ -255,7 +254,7 @@ blocks:
               hugepages-2Mi:      0
               hugepages-32Mi:     0
               hugepages-64Ki:     0
-              memory:             8025700Ki
+              memory:             8124776Ki
               pods:               110
             Allocatable:
               cpu:                8
@@ -264,37 +263,36 @@ blocks:
               hugepages-2Mi:      0
               hugepages-32Mi:     0
               hugepages-64Ki:     0
-              memory:             8025700Ki
+              memory:             8124776Ki
               pods:               110
             System Info:
-              Machine ID:                 de7a8bf9bda64c91a09b4ef9930ae150
-              System UUID:                de7a8bf9bda64c91a09b4ef9930ae150
-              Boot ID:                    e4b83f9a-ff7a-4f1e-a834-05a5268a9ed2
-              Kernel Version:             6.10.14-linuxkit
-              OS Image:                   Debian GNU/Linux 12 (bookworm)
+              Machine ID:                 0c5ebd922ba74f88b7873a1e8e083b0b
+              System UUID:                0c5ebd922ba74f88b7873a1e8e083b0b
+              Boot ID:                    15e720e9-d573-49ed-b1e8-7797038b5122
+              Kernel Version:             7.0.12-linuxkit
+              OS Image:                   Debian GNU/Linux 13 (trixie)
               Operating System:           linux
               Architecture:               arm64
-              Container Runtime Version:  containerd://2.1.1
-              Kubelet Version:            v1.33.1
-              Kube-Proxy Version:
+              Container Runtime Version:  containerd://2.3.1
+              Kubelet Version:            v1.36.1
             PodCIDR:                      10.244.0.0/24
             PodCIDRs:                     10.244.0.0/24
             ProviderID:                   kind://docker/desktop/desktop-control-plane
             Non-terminated Pods:          (12 in total)
               Namespace                   Name                                             CPU Requests  CPU Limits  Memory Requests  Memory Limits  Age
               ---------                   ----                                             ------------  ----------  ---------------  -------------  ---
-              default                     nginx-1                                          0 (0%)        0 (0%)      0 (0%)           0 (0%)         7s
-              default                     nginx-3                                          0 (0%)        0 (0%)      0 (0%)           0 (0%)         7s
-              kube-system                 coredns-674b8bbfcf-dtms5                         100m (1%)     0 (0%)      70Mi (0%)        170Mi (2%)     67m
-              kube-system                 coredns-674b8bbfcf-mlj6k                         100m (1%)     0 (0%)      70Mi (0%)        170Mi (2%)     67m
-              kube-system                 etcd-desktop-control-plane                       100m (1%)     0 (0%)      100Mi (1%)       0 (0%)         67m
-              kube-system                 kindnet-n4fjq                                    100m (1%)     100m (1%)   50Mi (0%)        50Mi (0%)      67m
-              kube-system                 kube-apiserver-desktop-control-plane             250m (3%)     0 (0%)      0 (0%)           0 (0%)         67m
-              kube-system                 kube-controller-manager-desktop-control-plane    200m (2%)     0 (0%)      0 (0%)           0 (0%)         67m
-              kube-system                 kube-proxy-zls4t                                 0 (0%)        0 (0%)      0 (0%)           0 (0%)         67m
-              kube-system                 kube-scheduler-desktop-control-plane             100m (1%)     0 (0%)      0 (0%)           0 (0%)         67m
-              local-path-storage          local-path-provisioner-7dc846544d-c2gl7          0 (0%)        0 (0%)      0 (0%)           0 (0%)         67m
-              test                        nginx-4                                          0 (0%)        0 (0%)      0 (0%)           0 (0%)         7s
+              default                     nginx-1                                          0 (0%)        0 (0%)      0 (0%)           0 (0%)         5s
+              default                     nginx-3                                          0 (0%)        0 (0%)      0 (0%)           0 (0%)         9s
+              kube-system                 coredns-589f44dc88-xwrfr                         100m (1%)     0 (0%)      70Mi (0%)        170Mi (2%)     63m
+              kube-system                 coredns-589f44dc88-zcpr6                         100m (1%)     0 (0%)      70Mi (0%)        170Mi (2%)     63m
+              kube-system                 etcd-desktop-control-plane                       100m (1%)     0 (0%)      100Mi (1%)       0 (0%)         63m
+              kube-system                 kindnet-rcwvf                                    100m (1%)     100m (1%)   50Mi (0%)        50Mi (0%)      63m
+              kube-system                 kube-apiserver-desktop-control-plane             250m (3%)     0 (0%)      0 (0%)           0 (0%)         63m
+              kube-system                 kube-controller-manager-desktop-control-plane    200m (2%)     0 (0%)      0 (0%)           0 (0%)         63m
+              kube-system                 kube-proxy-qfjg6                                 0 (0%)        0 (0%)      0 (0%)           0 (0%)         63m
+              kube-system                 kube-scheduler-desktop-control-plane             100m (1%)     0 (0%)      0 (0%)           0 (0%)         63m
+              local-path-storage          local-path-provisioner-855c7b7774-cb5fh          0 (0%)        0 (0%)      0 (0%)           0 (0%)         63m
+              test                        nginx-4                                          0 (0%)        0 (0%)      0 (0%)           0 (0%)         5s
             Allocated resources:
               (Total limits may be over 100 percent, i.e., overcommitted.)
               Resource           Requests    Limits
@@ -348,14 +346,14 @@ blocks:
             Namespace:        default
             Priority:         0
             Service Account:  default
-            Node:             desktop-control-plane/172.18.0.3
-            Start Time:       Sat, 15 Aug 2026 00:30:50 +0900
+            Node:             desktop-control-plane/172.18.0.2
+            Start Time:       Wed, 23 Sep 2026 23:55:13 +0900
             Labels:           run=nginx
             Annotations:      <none>
             Status:           Pending
-            IP:               10.244.0.72
+            IP:               10.244.0.27
             IPs:
-              IP:  10.244.0.72
+              IP:  10.244.0.27
             Containers:
               nginx:
                 Container ID:
@@ -369,7 +367,7 @@ blocks:
                 Restart Count:  0
                 Environment:    <none>
                 Mounts:
-                  /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-hpgjv (ro)
+                  /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-drkqx (ro)
             Conditions:
               Type                        Status
               PodReadyToStartContainers   True
@@ -378,7 +376,7 @@ blocks:
               ContainersReady             False
               PodScheduled                True
             Volumes:
-              kube-api-access-hpgjv:
+              kube-api-access-drkqx:
                 Type:                    Projected (a volume that contains injected data from multiple sources)
                 TokenExpirationSeconds:  3607
                 ConfigMapName:           kube-root-ca.crt
@@ -391,12 +389,12 @@ blocks:
             Events:
               Type     Reason     Age   From               Message
               ----     ------     ----  ----               -------
-              Normal   Scheduled  7s    default-scheduler  Successfully assigned default/nginx-1 to desktop-control-plane
-              Normal   Pulling    7s    kubelet            Pulling image "wrong-nginx"
-              Warning  Failed     4s    kubelet            Failed to pull image "wrong-nginx": failed to pull and unpack image "docker.io/library/wrong-nginx:latest": failed to resolve reference "docker.io/library/wrong-nginx:latest": pull access denied, repository does not exist or may require authorization: server message: insufficient_scope: authorization failed
-              Warning  Failed     4s    kubelet            Error: ErrImagePull
-              Normal   BackOff    3s    kubelet            Back-off pulling image "wrong-nginx"
-              Warning  Failed     3s    kubelet            Error: ImagePullBackOff
+              Normal   Scheduled  5s    default-scheduler  Successfully assigned default/nginx-1 to desktop-control-plane
+              Normal   Pulling    5s    kubelet            spec.containers{nginx}: Pulling image "wrong-nginx"
+              Warning  Failed     3s    kubelet            spec.containers{nginx}: Failed to pull image "wrong-nginx": failed to pull and unpack image "docker.io/library/wrong-nginx:latest": failed to resolve reference "docker.io/library/wrong-nginx:latest": pull access denied, repository does not exist or may require authorization: server message: insufficient_scope: authorization failed
+              Warning  Failed     3s    kubelet            spec.containers{nginx}: Error: ErrImagePull
+              Normal   BackOff    3s    kubelet            spec.containers{nginx}: Back-off pulling image "wrong-nginx"
+              Warning  Failed     3s    kubelet            spec.containers{nginx}: Error: ImagePullBackOff
 
 
   - exec:
@@ -434,14 +432,14 @@ blocks:
               annotations:
                 kubectl.kubernetes.io/last-applied-configuration: |
                   {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"creationTimestamp":null,"labels":{"run":"nginx"},"name":"nginx-1","namespace":"default"},"spec":{"containers":[{"image":"wrong-nginx","name":"nginx","resources":{}}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always"},"status":{}}
-              creationTimestamp: "2026-08-14T15:30:50Z"
+              creationTimestamp: "2026-09-23T14:55:13Z"
               generation: 1
               labels:
                 run: nginx
               name: nginx-1
               namespace: default
-              resourceVersion: "8033"
-              uid: 63b3b6ed-a423-4523-8e32-714a360cb057
+              resourceVersion: "7023"
+              uid: 95ed7d88-2d65-410b-8bb0-8f3edeb21470
             spec:
               containers:
               - image: wrong-nginx
@@ -452,7 +450,7 @@ blocks:
                 terminationMessagePolicy: File
                 volumeMounts:
                 - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-                  name: kube-api-access-hpgjv
+                  name: kube-api-access-drkqx
                   readOnly: true
               dnsPolicy: ClusterFirst
               enableServiceLinks: true
@@ -475,7 +473,7 @@ blocks:
                 operator: Exists
                 tolerationSeconds: 300
               volumes:
-              - name: kube-api-access-hpgjv
+              - name: kube-api-access-drkqx
                 projected:
                   defaultMode: 420
                   sources:
@@ -496,27 +494,32 @@ blocks:
             status:
               conditions:
               - lastProbeTime: null
-                lastTransitionTime: "2026-08-14T15:30:54Z"
+                lastTransitionTime: "2026-09-23T14:55:13Z"
+                observedGeneration: 1
                 status: "True"
                 type: PodReadyToStartContainers
               - lastProbeTime: null
-                lastTransitionTime: "2026-08-14T15:30:50Z"
+                lastTransitionTime: "2026-09-23T14:55:13Z"
+                observedGeneration: 1
                 status: "True"
                 type: Initialized
               - lastProbeTime: null
-                lastTransitionTime: "2026-08-14T15:30:50Z"
+                lastTransitionTime: "2026-09-23T14:55:13Z"
                 message: 'containers with unready status: [nginx]'
+                observedGeneration: 1
                 reason: ContainersNotReady
                 status: "False"
                 type: Ready
               - lastProbeTime: null
-                lastTransitionTime: "2026-08-14T15:30:50Z"
+                lastTransitionTime: "2026-09-23T14:55:13Z"
                 message: 'containers with unready status: [nginx]'
+                observedGeneration: 1
                 reason: ContainersNotReady
                 status: "False"
                 type: ContainersReady
               - lastProbeTime: null
-                lastTransitionTime: "2026-08-14T15:30:50Z"
+                lastTransitionTime: "2026-09-23T14:55:13Z"
+                observedGeneration: 1
                 status: "True"
                 type: PodScheduled
               containerStatuses:
@@ -536,23 +539,42 @@ blocks:
                     reason: ErrImagePull
                 volumeMounts:
                 - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-                  name: kube-api-access-hpgjv
+                  name: kube-api-access-drkqx
                   readOnly: true
                   recursiveReadOnly: Disabled
-              hostIP: 172.18.0.3
+              hostIP: 172.18.0.2
               hostIPs:
-              - ip: 172.18.0.3
+              - ip: 172.18.0.2
+              observedGeneration: 1
               phase: Pending
-              podIP: 10.244.0.72
+              podIP: 10.244.0.27
               podIPs:
-              - ip: 10.244.0.72
+              - ip: 10.244.0.27
               qosClass: BestEffort
-              startTime: "2026-08-14T15:30:50Z"
+              resources: {}
+              startTime: "2026-09-23T14:55:13Z"
 
 
   - md: |
       You can see `reason: ImagePullBackOff` and `message: Back-off pulling image "wrong-nginx"`
     level: 1
+
+  - exec:
+      desc: Fix the image of `nginx-1` and check that it becomes `Running`.
+      note: |
+        Editing `image` in `pod-nginx-1-with-wrong-nginx-image.yaml` and running `kubectl apply -f pod-nginx-1-with-wrong-nginx-image.yaml` works as well.
+      style: combined
+      commands:
+        - run: kubectl set image pod/nginx-1 nginx=nginx
+          output: |
+            pod/nginx-1 image updated
+        - run: kubectl get pod nginx-1
+          before:
+            - kubectl wait --for=condition=Ready pod/nginx-1 --timeout=180s
+          output: |
+            NAME      READY   STATUS    RESTARTS   AGE
+            nginx-1   1/1     Running   0          6s
+
 
   - md: |
       #### 2. Why isn't `nginx-2` running?
@@ -581,12 +603,12 @@ blocks:
                 Host Port:    <none>
                 Environment:  <none>
                 Mounts:
-                  /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-pwbzp (ro)
+                  /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-c857t (ro)
             Conditions:
               Type           Status
               PodScheduled   False
             Volumes:
-              kube-api-access-pwbzp:
+              kube-api-access-c857t:
                 Type:                    Projected (a volume that contains injected data from multiple sources)
                 TokenExpirationSeconds:  3607
                 ConfigMapName:           kube-root-ca.crt
@@ -599,7 +621,7 @@ blocks:
             Events:
               Type     Reason            Age   From               Message
               ----     ------            ----  ----               -------
-              Warning  FailedScheduling  7s    default-scheduler  0/1 nodes are available: 1 node(s) didn't match Pod's node affinity/selector. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.
+              Warning  FailedScheduling  6s    default-scheduler  0/1 nodes are available: 1 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.
 
 
   - md: |
@@ -663,8 +685,18 @@ blocks:
         - run: kubectl port-forward svc/nginx-1 8080:80
           skip: 手動で止めるまで終わらないので自動実行できない
 
+  - exec:
+      desc: Open http://localhost:8080 on your browser or send a request from another terminal.
+      style: combined
+      details: false
+      commands:
+        - run: curl -sS localhost:8080 | grep title
+          skip: port-forward を起動したままでないと繋がらないので自動実行できない
+          example: |
+            <title>Welcome to nginx!</title>
+
   - md: |
-      Open http://localhost:8080 on your browser or hit the localhost:8080 by a command e.g. `curl`
+      Stop the port-forward with `Ctrl-C`.
 
       ##### 2. Check `EndpointSlice` resource.
 
@@ -676,7 +708,7 @@ blocks:
         - run: kubectl get endpointslice -l kubernetes.io/service-name=nginx-1
           output: |
             NAME            ADDRESSTYPE   PORTS   ENDPOINTS                 AGE
-            nginx-1-2vhb2   IPv4          80      10.244.0.73,10.244.0.72   7s
+            nginx-1-7z8tn   IPv4          80      10.244.0.26,10.244.0.27   10s
 
 
   - md: |
@@ -690,28 +722,28 @@ blocks:
       commands:
         - run: kubectl describe endpointslice -l kubernetes.io/service-name=nginx-1
           output: |
-            Name:         nginx-1-2vhb2
+            Name:         nginx-1-7z8tn
             Namespace:    default
             Labels:       endpointslice.kubernetes.io/managed-by=endpointslice-controller.k8s.io
                           kubernetes.io/service-name=nginx-1
                           run=nginx
-            Annotations:  <none>
+            Annotations:  endpoints.kubernetes.io/last-change-trigger-time: 2026-09-23T14:55:19Z
             AddressType:  IPv4
             Ports:
               Name  Port  Protocol
               ----  ----  --------
               80    80    TCP
             Endpoints:
-              - Addresses:  10.244.0.73
+              - Addresses:  10.244.0.26
                 Conditions:
                   Ready:    true
                 Hostname:   <unset>
                 TargetRef:  Pod/nginx-3
                 NodeName:   desktop-control-plane
                 Zone:       <unset>
-              - Addresses:  10.244.0.72
+              - Addresses:  10.244.0.27
                 Conditions:
-                  Ready:    false
+                  Ready:    true
                 Hostname:   <unset>
                 TargetRef:  Pod/nginx-1
                 NodeName:   desktop-control-plane
@@ -726,16 +758,114 @@ blocks:
     level: 1
 
   - exec:
+      desc: Check the Pods that match the Service's `selector`.
+      style: combined
+      details: true
+      commands:
+        - run: kubectl get po -l run=nginx
+          output: |
+            NAME      READY   STATUS    RESTARTS   AGE
+            nginx-1   1/1     Running   0          7s
+            nginx-2   0/1     Pending   0          7s
+            nginx-3   1/1     Running   0          11s
+
+
+  - exec:
+      desc: Check the Service's `Port` and `TargetPort`.
+      style: combined
+      details: true
+      commands:
+        - run: kubectl describe svc nginx-1
+          output: |
+            Name:                     nginx-1
+            Namespace:                default
+            Labels:                   run=nginx
+            Annotations:              <none>
+            Selector:                 run=nginx
+            Type:                     ClusterIP
+            IP Family Policy:         SingleStack
+            IP Families:              IPv4
+            IP:                       10.96.150.56
+            IPs:                      10.96.150.56
+            Port:                     80  80/TCP
+            TargetPort:               80/TCP
+            Endpoints:                10.244.0.26:80,10.244.0.27:80
+            Session Affinity:         None
+            Internal Traffic Policy:  Cluster
+            Events:                   <none>
+
+
+  - md: |
+      ##### 3. Break `nginx-1` and see `Ready` change.
+
+  - exec:
+      desc: Set a wrong image to `nginx-1`.
+      note: |
+        Editing `image` in the YAML and running `kubectl apply` works as well.
+      style: combined
+      commands:
+        - run: kubectl set image pod/nginx-1 nginx=wrong-nginx
+          output: |
+            pod/nginx-1 image updated
+        - run: kubectl get pod nginx-1
+          before:
+            - |
+              for _ in $(seq 90); do
+                kubectl get pod nginx-1 -o jsonpath='{.status.containerStatuses[0].state.waiting.reason}' | grep -q ImagePull && break
+                sleep 2
+              done
+          output: |
+            NAME      READY   STATUS             RESTARTS   AGE
+            nginx-1   0/1     ImagePullBackOff   0          9s
+
+
+  - exec:
+      desc: "Describe `EndpointSlice` again. `nginx-1` is now `Ready: false`."
+      style: combined
+      details: true
+      commands:
+        - run: kubectl describe endpointslice -l kubernetes.io/service-name=nginx-1
+          output: |
+            Name:         nginx-1-7z8tn
+            Namespace:    default
+            Labels:       endpointslice.kubernetes.io/managed-by=endpointslice-controller.k8s.io
+                          kubernetes.io/service-name=nginx-1
+                          run=nginx
+            Annotations:  endpoints.kubernetes.io/last-change-trigger-time: 2026-09-23T14:55:21Z
+            AddressType:  IPv4
+            Ports:
+              Name  Port  Protocol
+              ----  ----  --------
+              80    80    TCP
+            Endpoints:
+              - Addresses:  10.244.0.26
+                Conditions:
+                  Ready:    true
+                Hostname:   <unset>
+                TargetRef:  Pod/nginx-3
+                NodeName:   desktop-control-plane
+                Zone:       <unset>
+              - Addresses:  10.244.0.27
+                Conditions:
+                  Ready:    false
+                Hostname:   <unset>
+                TargetRef:  Pod/nginx-1
+                NodeName:   desktop-control-plane
+                Zone:       <unset>
+            Events:         <none>
+
+
+  - exec:
       desc: Check Pod Ips.
       style: combined
       details: true
       commands:
         - run: kubectl get pod -o wide
           output: |
-            NAME      READY   STATUS         RESTARTS   AGE   IP            NODE                    NOMINATED NODE   READINESS GATES
-            nginx-1   0/1     ErrImagePull   0          7s    10.244.0.72   desktop-control-plane   <none>           <none>
-            nginx-2   0/1     Pending        0          7s    <none>        <none>                  <none>           <none>
-            nginx-3   1/1     Running        0          7s    10.244.0.73   desktop-control-plane   <none>           <none>
+            NAME      READY   STATUS             RESTARTS   AGE   IP            NODE                    NOMINATED NODE   READINESS GATES
+            nginx-1   0/1     ImagePullBackOff   0          9s    10.244.0.27   desktop-control-plane   <none>           <none>
+            nginx-2   0/1     Pending            0          9s    <none>        <none>                  <none>           <none>
+            nginx-3   1/1     Running            0          13s   10.244.0.26   desktop-control-plane   <none>           <none>
 
 
   - md: |
@@ -747,12 +877,12 @@ blocks:
       commands:
         - run: kubectl describe endpointslice -l kubernetes.io/service-name=nginx-2
           output: |
-            Name:         nginx-2-r8fsm
+            Name:         nginx-2-jspq7
             Namespace:    default
             Labels:       endpointslice.kubernetes.io/managed-by=endpointslice-controller.k8s.io
                           kubernetes.io/service-name=nginx-2
                           run=nginx
-            Annotations:  endpoints.kubernetes.io/last-change-trigger-time: 2026-08-14T15:30:50Z
+            Annotations:  endpoints.kubernetes.io/last-change-trigger-time: 2026-09-23T14:55:13Z
             AddressType:  IPv4
             Ports: <unset>
             Endpoints: <none>
@@ -764,53 +894,47 @@ blocks:
     level: 1
 
   - exec:
+      desc: Port-forward `nginx-2` and send a request from another terminal.
+      details: false
+      commands:
+        - run: kubectl port-forward svc/nginx-2 8080:80
+          skip: 手動で止めるまで終わらないので自動実行できない
+        - run: curl -sS localhost:8080 | grep title
+          skip: port-forward を起動したままでないと繋がらないので自動実行できない
+          example: |
+            curl: (7) Failed to connect to localhost port 8080 after 0 ms: Couldn't connect to server
+
+  - md: |
+      No Pod receives the request. Stop the port-forward with `Ctrl-C`.
+    level: 1
+
+  - exec:
       desc: Check `Service`'s `selector`
       style: combined
       details: true
       commands:
-        - run: kubectl get svc nginx-2 -o yaml
+        - run: kubectl describe svc nginx-2
           output: |
-            apiVersion: v1
-            kind: Service
-            metadata:
-              annotations:
-                kubectl.kubernetes.io/last-applied-configuration: |
-                  {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"creationTimestamp":null,"labels":{"run":"nginx"},"name":"nginx-2","namespace":"default"},"spec":{"ports":[{"name":"80","port":80,"protocol":"TCP","targetPort":80}],"selector":{"run":"nonexisting"},"type":"ClusterIP"},"status":{"loadBalancer":{}}}
-              creationTimestamp: "2026-08-14T15:30:50Z"
-              labels:
-                run: nginx
-              name: nginx-2
-              namespace: default
-              resourceVersion: "8013"
-              uid: f7bf8ca1-3f62-4b71-82b5-74d5628b8504
-            spec:
-              clusterIP: 10.96.202.236
-              clusterIPs:
-              - 10.96.202.236
-              internalTrafficPolicy: Cluster
-              ipFamilies:
-              - IPv4
-              ipFamilyPolicy: SingleStack
-              ports:
-              - name: "80"
-                port: 80
-                protocol: TCP
-                targetPort: 80
-              selector:
-                run: nonexisting
-              sessionAffinity: None
-              type: ClusterIP
-            status:
-              loadBalancer: {}
+            Name:                     nginx-2
+            Namespace:                default
+            Labels:                   run=nginx
+            Annotations:              <none>
+            Selector:                 run=nonexisting
+            Type:                     ClusterIP
+            IP Family Policy:         SingleStack
+            IP Families:              IPv4
+            IP:                       10.96.45.86
+            IPs:                      10.96.45.86
+            Port:                     80  80/TCP
+            TargetPort:               80/TCP
+            Endpoints:
+            Session Affinity:         None
+            Internal Traffic Policy:  Cluster
+            Events:                   <none>
 
 
   - md: |
-      ```yaml
-        selector:
-          run: nonexisting
-      ```
-
-      There's no Pod with such a label.
+      `Selector: run=nonexisting` -> There's no Pod with such a label.
     level: 1
 
   - exec:
@@ -820,10 +944,41 @@ blocks:
       commands:
         - run: kubectl get po --show-labels
           output: |
-            NAME      READY   STATUS         RESTARTS   AGE   LABELS
-            nginx-1   0/1     ErrImagePull   0          7s    run=nginx
-            nginx-2   0/1     Pending        0          7s    run=nginx
-            nginx-3   1/1     Running        0          7s    run=nginx
+            NAME      READY   STATUS             RESTARTS   AGE   LABELS
+            nginx-1   0/1     ImagePullBackOff   0          9s    run=nginx
+            nginx-2   0/1     Pending            0          9s    run=nginx
+            nginx-3   1/1     Running            0          13s   run=nginx
+
+
+  - exec:
+      desc: Check that no Pod matches the `selector`.
+      style: combined
+      commands:
+        - run: kubectl get po -l run=nonexisting
+          output: |
+            No resources found in default namespace.
+
+
+  - exec:
+      desc: Fix the `selector` of `nginx-2` and check `EndpointSlice` again.
+      note: |
+        Editing `selector` in `service-nginx-2-with-non-existing-selector.yaml` and running `kubectl apply` works as well.
+      style: combined
+      commands:
+        - run: kubectl set selector service nginx-2 run=nginx
+          output: |
+            service/nginx-2 selector updated
+        - run: kubectl get endpointslice -l kubernetes.io/service-name=nginx-2
+          before:
+            - |
+              for _ in $(seq 60); do
+                kubectl get endpointslice -l kubernetes.io/service-name=nginx-2 -o jsonpath='{.items[*].endpoints[*].targetRef.name}' | grep -q nginx && break
+                sleep 1
+              done
+          output: |
+            NAME            ADDRESSTYPE   PORTS   ENDPOINTS                 AGE
+            nginx-2-jspq7   IPv4          80      10.244.0.26,10.244.0.27   9s
+
 
 
   - md: |
